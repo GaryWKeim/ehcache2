@@ -259,4 +259,12 @@
     </profile>
   </profiles>
 
+  <repositories>
+    <repository>
+      <id>ow2</id>
+      <url>https://repository.ow2.org/nexus/content/repositories/ow2-legacy/</url>
+      <releases><enabled>true</enabled></releases>
+      <snapshots><enabled>false</enabled></snapshots>
+    </repository>
+  </repositories>
 </project>
