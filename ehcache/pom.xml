@@ -52,11 +52,6 @@
     </dependency>
     <dependency>
       <groupId>net.sf.ehcache.internal</groupId>
-      <artifactId>ehcache-scheduled-refresh</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>net.sf.ehcache.internal</groupId>
       <artifactId>ehcache-search-parser</artifactId>
       <version>${project.version}</version>
     </dependency>
@@ -83,12 +78,6 @@
     <dependency>
       <groupId>org.codehaus.btm</groupId>
       <artifactId>btm</artifactId>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.quartz-scheduler</groupId>
-      <artifactId>quartz</artifactId>
-      <version>2.2.3</version>
       <scope>test</scope>
     </dependency>
     <dependency>
@@ -367,8 +356,6 @@
                   org.w3c.dom;resolution:=optional,
                   org.hibernate.*;resolution:=optional,
                   org.terracotta.toolkit.*;resolution:=optional,
-                  org.quartz.*;resolution:=optional,
-                  org.terracotta.quartz.*;resolution:=optional,
                   com.sun.management.*;resolution:="optional",
                   net.sf.ehcache.terracotta.security;resolution:=optional,
                   org.jboss.vfs;resolution:=optional,

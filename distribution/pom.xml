@@ -152,7 +152,6 @@
               <directory>${terracotta.kit.path}</directory>
               <excludes>
                 <exclude>**/ehcache/**</exclude>
-                <exclude>**/quartz/**</exclude>
                 <exclude>**/sessions/**</exclude>
               </excludes>
               <preservePath>true</preservePath>
