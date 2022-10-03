@@ -39,7 +39,6 @@
     <module>ehcache-core</module>
     <module>terracotta</module>
     <module>ehcache</module>
-    <module>management-ehcache-v1</module>
     <module>management-ehcache-v2</module>
     <module>management-ehcache-impl</module>
     <module>ehcache-search-parser</module>
