@@ -24,7 +24,6 @@ import net.sf.ehcache.CacheStoreHelper;
 import net.sf.ehcache.Ehcache;
 import net.sf.ehcache.Element;
 import net.sf.ehcache.Status;
-import net.sf.ehcache.distribution.CacheReplicator;
 import net.sf.ehcache.store.TerracottaStore;
 import org.terracotta.statistics.StatisticsManager;
 import org.terracotta.statistics.observer.OperationObserver;
@@ -57,8 +56,6 @@ public class RegisteredEventListeners {
     private final Set<ListenerWrapper> cacheEventListeners = new CopyOnWriteArraySet<ListenerWrapper>();
     private final Set<InternalCacheEventListener> orderedListeners = new CopyOnWriteArraySet<InternalCacheEventListener>();
     private final Ehcache cache;
-
-    private final AtomicBoolean hasReplicator = new AtomicBoolean(false);
 
     private final CacheStoreHelper helper;
 
@@ -354,7 +351,7 @@ public class RegisteredEventListeners {
      */
     private static boolean isCircularNotification(boolean remoteEvent, CacheEventListener cacheEventListener) {
         return remoteEvent
-                && (cacheEventListener instanceof CacheReplicator || cacheEventListener instanceof TerracottaCacheEventReplication);
+                && cacheEventListener instanceof TerracottaCacheEventReplication;
     }
 
 
@@ -386,9 +383,6 @@ public class RegisteredEventListeners {
             return false;
         }
         boolean result = cacheEventListeners.add(new ListenerWrapper(cacheEventListener, scope));
-        if (result && cacheEventListener instanceof CacheReplicator) {
-            this.hasReplicator.set(true);
-        }
         if (result) {
             notifyEventListenersChangedIfNecessary();
         }
@@ -426,18 +420,9 @@ public class RegisteredEventListeners {
             if (listenerWrapper.getListener().equals(cacheEventListener)) {
                 cacheEventListeners.remove(listenerWrapper);
                 result = true;
-            } else {
-                if (listenerWrapper.getListener() instanceof CacheReplicator) {
-                    cacheReplicators++;
-                }
             }
         }
 
-        if (cacheReplicators > 0) {
-            hasReplicator.set(true);
-        } else {
-            hasReplicator.set(false);
-        }
         if (result) {
             notifyEventListenersChangedIfNecessary();
         }
@@ -452,15 +437,6 @@ public class RegisteredEventListeners {
      */
     final boolean unregisterOrderedListener(InternalCacheEventListener cacheEventListener) {
         return orderedListeners.remove(cacheEventListener);
-    }
-
-    /**
-     * Determines whether any registered listeners are CacheReplicators.
-     *
-     * @return whether any registered listeners are CacheReplicators.
-     */
-    public final boolean hasCacheReplicators() {
-        return hasReplicator.get();
     }
 
     /**

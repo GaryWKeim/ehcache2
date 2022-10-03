@@ -3724,8 +3724,6 @@ public class Cache implements InternalEhcache, StoreListener {
     public Element putIfAbsent(Element element, boolean doNotNotifyCacheReplicators) throws NullPointerException {
         checkStatus();
 
-        checkCASOperationSupported(doNotNotifyCacheReplicators);
-
         if (element.getObjectKey() == null) {
             throw new NullPointerException();
         }
@@ -3758,8 +3756,6 @@ public class Cache implements InternalEhcache, StoreListener {
     public boolean removeElement(Element element) throws NullPointerException {
         checkStatus();
 
-        checkCASOperationSupported();
-
         if (element.getObjectKey() == null) {
             throw new NullPointerException();
         }
@@ -3786,8 +3782,6 @@ public class Cache implements InternalEhcache, StoreListener {
      */
     public boolean replace(Element old, Element element) throws NullPointerException, IllegalArgumentException {
         checkStatus();
-
-        checkCASOperationSupported();
 
         if (old.getObjectKey() == null || element.getObjectKey() == null) {
             throw new NullPointerException();
@@ -3826,8 +3820,6 @@ public class Cache implements InternalEhcache, StoreListener {
     public Element replace(Element element) throws NullPointerException {
         checkStatus();
 
-        checkCASOperationSupported();
-
         if (element.getObjectKey() == null) {
             throw new NullPointerException();
         }
@@ -3852,17 +3844,6 @@ public class Cache implements InternalEhcache, StoreListener {
             replace1Observer.end(CacheOperationOutcomes.ReplaceOneArgOutcome.FAILURE);
         }
         return result;
-    }
-
-    private void checkCASOperationSupported() {
-        checkCASOperationSupported(false);
-    }
-
-    private void checkCASOperationSupported(boolean doNotNotifyCacheReplicators) {
-        if (!doNotNotifyCacheReplicators && registeredEventListeners.hasCacheReplicators()) {
-            throw new CacheException(
-                    "You have configured the cache with a replication scheme that cannot properly support CAS operation guarantees.");
-        }
     }
 
     /**

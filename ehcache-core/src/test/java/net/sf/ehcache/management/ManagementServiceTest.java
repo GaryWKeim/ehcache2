@@ -83,7 +83,7 @@ import static org.mockito.Mockito.when;
 public class ManagementServiceTest extends AbstractCacheTest {
 
     private static final Logger LOG = LoggerFactory.getLogger(ManagementServiceTest.class.getName());
-    private static final int OBJECTS_IN_TEST_EHCACHE = 46;
+    private static final int OBJECTS_IN_TEST_EHCACHE = 43;
     private MBeanServer mBeanServer;
 
 
@@ -169,7 +169,7 @@ public class ManagementServiceTest extends AbstractCacheTest {
         Configuration configuration = ConfigurationFactory.parseConfiguration(file).name("cm-2");
         net.sf.ehcache.CacheManager secondCacheManager = new net.sf.ehcache.CacheManager(configuration);
         ManagementService.registerMBeans(secondCacheManager, mBeanServer, true, true, true, true, true);
-        assertThat(mBeanServer.queryNames(new ObjectName("net.sf.ehcache:*"), null), hasSize(OBJECTS_IN_TEST_EHCACHE + 19));
+        assertThat(mBeanServer.queryNames(new ObjectName("net.sf.ehcache:*"), null), hasSize(OBJECTS_IN_TEST_EHCACHE + 10));
         secondCacheManager.shutdown();
         assertThat(mBeanServer.queryNames(new ObjectName("net.sf.ehcache:*"), null), hasSize(OBJECTS_IN_TEST_EHCACHE));
     }
@@ -197,7 +197,7 @@ public class ManagementServiceTest extends AbstractCacheTest {
     @Test
     public void testRegistrationServiceThreeTrue() throws Exception {
         ManagementService.registerMBeans(manager, mBeanServer, true, true, true, false, false);
-        assertThat(mBeanServer.queryNames(new ObjectName("net.sf.ehcache:*"), null), hasSize(31));
+        assertThat(mBeanServer.queryNames(new ObjectName("net.sf.ehcache:*"), null), hasSize(29));
 
     }
 
@@ -207,7 +207,7 @@ public class ManagementServiceTest extends AbstractCacheTest {
     @Test
     public void testRegistrationServiceTwoTrue() throws Exception {
         ManagementService.registerMBeans(manager, mBeanServer, true, true, false, false, false);
-        assertThat(mBeanServer.queryNames(new ObjectName("net.sf.ehcache:*"), null), hasSize(16));
+        assertThat(mBeanServer.queryNames(new ObjectName("net.sf.ehcache:*"), null), hasSize(15));
     }
 
     /**
@@ -279,7 +279,7 @@ public class ManagementServiceTest extends AbstractCacheTest {
         LOG.info(object.toString());
 
         List<?> caches = (List<?>) mBeanServer.getAttribute(name, "Caches");
-        assertThat(caches, hasSize(15));
+        assertThat(caches, hasSize(14));
 
         for (int i = 0; i < caches.size(); i++) {
             Cache cache = (Cache) caches.get(i);

@@ -286,32 +286,6 @@
           </execution>
         </executions>
       </plugin>
-      <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>rmic-maven-plugin</artifactId>
-        <executions>
-          <execution>
-            <id>rmi-compilation</id>
-            <phase>compile</phase>
-            <goals>
-              <goal>rmic</goal>
-            </goals>
-            <configuration>
-              <includes>
-                <include>**/RMICachePeer.class</include>
-              </includes>
-              <outputDirectory>${project.build.outputDirectory}</outputDirectory>
-            </configuration>
-          </execution>
-        </executions>
-        <dependencies>
-          <dependency>
-            <groupId>org.glassfish.corba</groupId>
-            <artifactId>rmic</artifactId>
-            <version>4.2.1</version>
-          </dependency>
-        </dependencies>
-      </plugin>
     </plugins>
   </build>
 

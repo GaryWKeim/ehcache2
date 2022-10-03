@@ -3,12 +3,6 @@
     <!-- This does not work, because the java.io.tmpdir gets replaced before the property replacement-->
     <diskStore path="${specialdir}/subdirectory/nextone"/>
 
-    <cacheManagerPeerProviderFactory
-                            class="net.sf.ehcache.distribution.RMICacheManagerPeerProviderFactory"
-                            properties="peerDiscovery=automatic, multicastGroupAddress=230.0.0.1,
-                                        multicastGroupPort=${multicastGroupPort}, timeToLive=0"/>
-
-
     <terracottaConfig url="${serverAndPort}"/>
     
 

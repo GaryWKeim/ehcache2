@@ -17,8 +17,6 @@
 package net.sf.ehcache;
 
 
-import net.sf.ehcache.distribution.AbstractRMITest;
-
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -77,11 +75,6 @@ public abstract class AbstractCacheTest {
      * the CacheManager instance
      */
     protected CacheManager manager;
-
-    @BeforeClass
-    public static void installRMISocketFactory() {
-      AbstractRMITest.installRMISocketFactory();
-    }
 
     /**
      * setup test

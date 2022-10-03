@@ -18,7 +18,7 @@
            overflowToDisk="false">
 
         <cacheEventListenerFactory
-                class="net.sf.ehcache.distribution.RMICacheReplicatorFactory"/>
+                class="net.sf.ehcache.event.CountingCacheEventListenerFactory"/>
     </cache>
 
     <cache name="listenAll"
@@ -29,7 +29,7 @@
            overflowToDisk="false">
 
         <cacheEventListenerFactory
-                class="net.sf.ehcache.distribution.RMICacheReplicatorFactory" listenFor="all"/>
+                class="net.sf.ehcache.event.CountingCacheEventListenerFactory" listenFor="all"/>
     </cache>
 
     <cache name="listenLocal"
@@ -40,7 +40,7 @@
            overflowToDisk="false">
 
         <cacheEventListenerFactory
-                class="net.sf.ehcache.distribution.RMICacheReplicatorFactory" listenFor="local"/>
+                class="net.sf.ehcache.event.CountingCacheEventListenerFactory" listenFor="local"/>
     </cache>
 
     <cache name="listenRemote"
@@ -51,7 +51,7 @@
            overflowToDisk="false">
 
         <cacheEventListenerFactory
-                class="net.sf.ehcache.distribution.RMICacheReplicatorFactory" listenFor="remote"/>
+                class="net.sf.ehcache.event.CountingCacheEventListenerFactory" listenFor="remote"/>
     </cache>
 
 </ehcache>

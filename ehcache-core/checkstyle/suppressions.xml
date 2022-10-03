@@ -87,7 +87,6 @@
   <suppress checks="" files="net[\\/]sf[\\/]ehcache[\\/]util[\\/]concurrent[\\/]"/>
 
   <!-- Contains a thread therefore cannot.  -->
-  <suppress checks="SuperClone" files="RMIBootstrapCacheLoader.java"/>
   <suppress checks="SuperClone" files="ClassLoaderAwareCache.java"/>
 
   <!-- SUPPRESSIONS TO BE CLEARED AFTER CHECKSTYLE REWORK -->
@@ -160,22 +159,8 @@
   <suppress checks="JavadocMethod" files="DiskStorePathManager.java"/>
   <suppress checks="JavadocMethod" files="CacheManagerPeerProvider.java"/>
   <suppress checks="JavadocMethod" files="CachePeer.java"/>
-  <suppress checks="JavadocMethod" files="ConfigurableRMIClientSocketFactory.java"/>
   <suppress checks="JavadocMethod" files="EventMessage.java"/>
   <suppress checks="JavadocMethod" files="LegacyEventMessage.java"/>
-  <suppress checks="JavadocMethod" files="ManualRMICacheManagerPeerProvider.java"/>
-  <suppress checks="JavadocMethod" files="MulticastKeepaliveHeartbeatReceiver.java"/>
-  <suppress checks="JavadocMethod" files="MulticastKeepaliveHeartbeatSender.java"/>
-  <suppress checks="JavadocMethod" files="MulticastRMICacheManagerPeerProvider.java"/>
-  <suppress checks="JavadocMethod" files="RMIAsynchronousCacheReplicator.java"/>
-  <suppress checks="JavadocMethod" files="RMIBootstrapCacheLoader.java"/>
-  <suppress checks="JavadocMethod" files="RMICacheManagerPeerListenerFactory.java"/>
-  <suppress checks="JavadocMethod" files="RMICacheManagerPeerProvider.java"/>
-  <suppress checks="JavadocMethod" files="RMICacheManagerPeerProviderFactory.java"/>
-  <suppress checks="JavadocMethod" files="RMICachePeer.java"/>
-  <suppress checks="JavadocMethod" files="RmiEventMessage.java"/>
-  <suppress checks="JavadocMethod" files="RMISynchronousCacheReplicator.java"/>
-  <suppress checks="JavadocMethod" files="TransactionalRMICachePeer.java"/>
   <suppress checks="JavadocMethod" files="Ehcache.java"/>
   <suppress checks="JavadocMethod" files="Element.java"/>
   <suppress checks="JavadocMethod" files="ElementIdHelper.java"/>
@@ -342,7 +327,6 @@
   <suppress checks="JavadocMethod" files="NonStopWriteBehind.java"/>
   <suppress checks="JavadocMethod" files="WriteBehindManager.java"/>
   <suppress checks="JavadocMethod" files="StripedReadWriteLock.java"/>
-  <suppress checks="JavadocMethod" files="RMICacheManagerPeerListener.java"/>
   <suppress checks="JavadocMethod" files="CacheExtensionFactory.java"/>
   <suppress checks="JavadocMethod" files="CacheMBean.java"/>
   <suppress checks="JavadocMethod" files="JvmInformation.java"/>

@@ -30,8 +30,6 @@ import net.sf.ehcache.config.ManagementRESTServiceConfiguration;
 import net.sf.ehcache.config.SizeOfPolicyConfiguration;
 import net.sf.ehcache.config.generator.ConfigurationSource;
 import net.sf.ehcache.config.generator.ConfigurationUtil;
-import net.sf.ehcache.distribution.CacheManagerPeerListener;
-import net.sf.ehcache.distribution.CacheManagerPeerProvider;
 import net.sf.ehcache.event.CacheEventListener;
 import net.sf.ehcache.event.CacheManagerEventListener;
 import net.sf.ehcache.event.CacheManagerEventListenerRegistry;
@@ -167,16 +165,6 @@ public class CacheManager {
      * Status of the Cache Manager
      */
     protected volatile Status status;
-
-    /**
-     * The map of providers
-     */
-    protected final Map<String, CacheManagerPeerProvider> cacheManagerPeerProviders = new ConcurrentHashMap<String, CacheManagerPeerProvider>();
-
-    /**
-     * The map of listeners
-     */
-    protected final Map<String, CacheManagerPeerListener> cacheManagerPeerListeners = new ConcurrentHashMap<String, CacheManagerPeerListener>();
 
     /**
      * The listener registry
@@ -478,10 +466,6 @@ public class CacheManager {
 
         status = Status.STATUS_ALIVE;
 
-        for (CacheManagerPeerProvider cacheManagerPeerProvider : cacheManagerPeerProviders.values()) {
-            cacheManagerPeerProvider.init();
-        }
-
         cacheManagerEventListenerRegistry.init();
         addShutdownHookIfRequired();
 
@@ -775,46 +759,9 @@ public class CacheManager {
 
         cacheManagerEventListenerRegistry.registerListener(configurationHelper.createCacheManagerEventListener(this));
 
-        cacheManagerPeerListeners.putAll(configurationHelper.createCachePeerListeners());
-        for (CacheManagerPeerListener cacheManagerPeerListener : cacheManagerPeerListeners.values()) {
-            cacheManagerEventListenerRegistry.registerListener(cacheManagerPeerListener);
-        }
-
-        detectAndFixCacheManagerPeerListenerConflict(configurationHelper);
-
         ALL_CACHE_MANAGERS.add(this);
 
-        cacheManagerPeerProviders.putAll(configurationHelper.createCachePeerProviders());
         defaultCache = configurationHelper.createDefaultCache();
-    }
-
-    private void detectAndFixCacheManagerPeerListenerConflict(ConfigurationHelper configurationHelper) {
-        if (cacheManagerPeerListeners == null) {
-            return;
-        }
-        for (CacheManagerPeerListener cacheManagerPeerListener : cacheManagerPeerListeners.values()) {
-            String uniqueResourceIdentifier = cacheManagerPeerListener.getUniqueResourceIdentifier();
-            for (CacheManager cacheManager : ALL_CACHE_MANAGERS) {
-                for (CacheManagerPeerListener otherCacheManagerPeerListener : cacheManager.cacheManagerPeerListeners.values()) {
-                    if (otherCacheManagerPeerListener == null) {
-                        continue;
-                    }
-                    String otherUniqueResourceIdentifier = otherCacheManagerPeerListener.getUniqueResourceIdentifier();
-                    if (uniqueResourceIdentifier.equals(otherUniqueResourceIdentifier)) {
-                        LOG.warn("Creating a new instance of CacheManager with a CacheManagerPeerListener which "
-                                + "has a conflict on a resource that must be unique.\n" + "The resource is " + uniqueResourceIdentifier
-                                + ".\n" + "Attempting automatic resolution. The source of the configuration was "
-                                + configurationHelper.getConfigurationBean().getConfigurationSource() + ".\n"
-                                + "To avoid this warning consider using the CacheManager factory methods to create a "
-                                + "singleton CacheManager "
-                                + "or specifying a separate ehcache configuration (ehcache.xml) for each CacheManager instance.");
-                        cacheManagerPeerListener.attemptResolutionOfUniqueResourceConflict();
-                        break;
-                    }
-                }
-
-            }
-        }
     }
 
     private void addConfiguredCaches(ConfigurationHelper configurationHelper) {
@@ -1542,20 +1489,6 @@ public class CacheManager {
                 defaultCache.dispose();
             }
 
-            for (CacheManagerPeerProvider cacheManagerPeerProvider : cacheManagerPeerProviders.values()) {
-                if (cacheManagerPeerProvider != null) {
-                    cacheManagerPeerProvider.dispose();
-                }
-            }
-            cacheManagerPeerProviders.clear();
-
-            for (CacheManagerPeerListener cacheManagerPeerListener : cacheManagerPeerListeners.values()) {
-                if (cacheManagerPeerListener != null) {
-                    cacheManagerPeerListener.dispose();
-                }
-            }
-            cacheManagerPeerListeners.clear();
-
             // cancel the cacheManager timer and all tasks
             if (cacheManagerTimer != null) {
                 cacheManagerTimer.cancel();
@@ -1682,37 +1615,6 @@ public class CacheManager {
                 ((Ehcache) entry.getValue()).removeAll();
             }
         }
-    }
-
-    /**
-     * Gets the <code>CacheManagerPeerProvider</code>, matching the given scheme
-     * For distributed caches, the peer provider finds other cache managers and their caches in the same cluster
-     *
-     * @param scheme
-     *            the replication scheme to use. Schemes shipped with ehcache are RMI, JGROUPS, JMS
-     * @return the provider, or null if one does not exist
-     */
-    public CacheManagerPeerProvider getCacheManagerPeerProvider(String scheme) {
-        return cacheManagerPeerProviders.get(scheme);
-    }
-
-    /**
-     * @return Read-only map of the registered {@link CacheManagerPeerProvider}s keyed by scheme.
-     */
-    public Map<String, CacheManagerPeerProvider> getCacheManagerPeerProviders() {
-        return Collections.unmodifiableMap(this.cacheManagerPeerProviders);
-    }
-
-    /**
-     * When CacheManage is configured as part of a cluster, a CacheManagerPeerListener will
-     * be registered in it. Use this to access the individual cache listeners
-     *
-     * @param scheme
-     *            the replication scheme to use. Schemes shipped with ehcache are RMI, JGROUPS, JMS
-     * @return the listener, or null if one does not exist
-     */
-    public CacheManagerPeerListener getCachePeerListener(String scheme) {
-        return cacheManagerPeerListeners.get(scheme);
     }
 
     /**
