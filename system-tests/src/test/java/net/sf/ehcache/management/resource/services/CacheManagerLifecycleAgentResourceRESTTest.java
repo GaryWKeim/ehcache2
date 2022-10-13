@@ -47,7 +47,7 @@ import static org.hamcrest.Matchers.equalTo;
  * This test illustrates agent lifecycle compared to CacheManager one.
  */
 public class CacheManagerLifecycleAgentResourceRESTTest {
-    private static final String EXPECTED_RESOURCE_LOCATION = "/tc-management-api/agents";
+    private static final String EXPECTED_RESOURCE_LOCATION = "/tc-management-api/v2/agents";
     private static ClusterManager clusterManager;
     private CacheManager cacheManager;
 
@@ -93,7 +93,7 @@ public class CacheManagerLifecycleAgentResourceRESTTest {
 
     @Test
     public void given_a_clustered_cache_manager_when_no_clustered_cache_then_L1_and_L2_agent_available() {
-      expect().contentType(ContentType.JSON)
+      expect().contentType(ContentType.JSON).rootPath("entities")
               .body("size()", is(2))
               .body("get(0).agencyOf", equalTo("TSA"))
               .body("get(1).agencyOf", equalTo("Ehcache"))
@@ -109,14 +109,14 @@ public class CacheManagerLifecycleAgentResourceRESTTest {
         CacheManager cacheManagerTwo = CacheManager.newInstance(configuration);
         try {
           ThreadUtil.reallySleep(1000);
-          expect().contentType(ContentType.JSON)
+          expect().contentType(ContentType.JSON).rootPath("entities")
                   .body("size()", is(3))
                   .statusCode(200)
                   .when().get(ResourceServiceImplITHelper.CLUSTERED_BASE_URL + EXPECTED_RESOURCE_LOCATION);
         } finally {
             cacheManagerTwo.shutdown();
         }
-        expect().contentType(ContentType.JSON)
+        expect().contentType(ContentType.JSON).rootPath("entities")
                 .body("size()", is(2))
                 .statusCode(200)
                 .when().get(ResourceServiceImplITHelper.CLUSTERED_BASE_URL + EXPECTED_RESOURCE_LOCATION);

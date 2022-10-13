@@ -176,7 +176,6 @@ public class ToolkitInstanceFactoryImpl implements ToolkitInstanceFactory {
         break;
     }
     terracottaClientBuilder.addTunnelledMBeanDomain("net.sf.ehcache");
-    terracottaClientBuilder.addTunnelledMBeanDomain("net.sf.ehcache.hibernate");
     terracottaClientBuilder.addTunnelledMBeanDomain("org.terracotta.wan");
     terracottaClientBuilder.setRejoinEnabled(terracottaClientConfiguration.isRejoin());
     terracottaClientBuilder.setProductId(productId);

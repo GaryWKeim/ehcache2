@@ -31,14 +31,9 @@ import java.util.concurrent.atomic.AtomicLong;
 
 import net.sf.ehcache.Element;
 import net.sf.ehcache.ElementIdHelper;
-import net.sf.ehcache.store.ElementIdAssigningStore;
-import net.sf.ehcache.store.NullStore;
-import net.sf.ehcache.store.Store;
 import net.sf.ehcache.util.LongSequence;
 
 import org.junit.Test;
-
-import antlr.collections.List;
 
 public class ElementIdAssigningStoreTest {
 
@@ -101,7 +96,7 @@ public class ElementIdAssigningStoreTest {
     }
 
     private boolean isCollection(Class type) {
-        return Map.class.isAssignableFrom(type) || List.class.isAssignableFrom(type) || Collection.class.isAssignableFrom(type);
+        return Map.class.isAssignableFrom(type) || Collection.class.isAssignableFrom(type);
     }
 
     private static void assertId(Element e, int expectedId) {

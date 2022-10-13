@@ -189,8 +189,7 @@
                       project.artifacts.find{it.artifactId == artifactId}?.version ?: ''
                     }
                     def props = [
-                            'slf4j.version'           : find('slf4j-api'),
-                            'hibernate-core.version'  : find('hibernate-core')
+                            'slf4j.version'           : find('slf4j-api')
                     ]
                     println "Resolved dependency versions: ${props}"
                     project.properties.putAll(props)

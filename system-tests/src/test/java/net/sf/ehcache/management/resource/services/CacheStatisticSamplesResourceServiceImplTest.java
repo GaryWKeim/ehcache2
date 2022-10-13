@@ -38,7 +38,7 @@ import static org.hamcrest.Matchers.*;
  * works fine
  */
 public class CacheStatisticSamplesResourceServiceImplTest extends ResourceServiceImplITHelper {
-  protected static final String EXPECTED_RESOURCE_LOCATION = "/tc-management-api/agents{agentIds}/cacheManagers{cmIds}/caches{cacheIds}/statistics/samples{sampleIds}";
+  protected static final String EXPECTED_RESOURCE_LOCATION = "/tc-management-api/v2/agents{agentIds}/cacheManagers{cmIds}/caches{cacheIds}/statistics/samples{sampleIds}";
 
   @BeforeClass
   public static void setUpCluster() throws Exception {
@@ -98,8 +98,7 @@ public class CacheStatisticSamplesResourceServiceImplTest extends ResourceServic
     samplesFilter = ";names=LocalHeapSize";
     // we precise the cacheManager, cache and 2 stats we want to retrieve
     givenStandalone()
-    .expect()
-      .contentType(ContentType.JSON)
+    .expect().contentType(ContentType.JSON).rootPath("entities")
       .body("get(0).agentId", equalTo("embedded"))
       .body("get(0).name", equalTo("testCache2"))
       .body("get(0).cacheManagerName", equalTo("testCacheManagerProgrammatic"))
@@ -116,7 +115,7 @@ public class CacheStatisticSamplesResourceServiceImplTest extends ResourceServic
     cmsFilter= "";
     // we precise the cache and 2 stats we want to retrieve
     givenStandalone()
-    .expect().contentType(ContentType.JSON)
+    .expect().contentType(ContentType.JSON).rootPath("entities")
       .body("get(0).agentId", equalTo("embedded"))
       .body("get(0).name", equalTo("testCache2"))
       .body("get(0).cacheManagerName", equalTo("testCacheManagerProgrammatic"))
@@ -134,15 +133,15 @@ public class CacheStatisticSamplesResourceServiceImplTest extends ResourceServic
     // we precise 2 stats we want to retrieve
     givenStandalone()
     .expect()
-      .contentType(ContentType.JSON)
+      .contentType(ContentType.JSON).rootPath("entities")
       .body("size()", is(2))
-      .rootPath("find { it.name =='testCache2' }")
+      .rootPath("entities.find { it.name =='testCache2' }")
         .body("agentId", equalTo("embedded"))
         .body("cacheManagerName", equalTo("testCacheManagerProgrammatic"))
         .body("statName", equalTo("LocalHeapSize"))
         .body("statValueByTimeMillis.size()", greaterThan(0))
         .body("statValueByTimeMillis.values()[0]", greaterThan(0))
-      .rootPath("find { it.name =='testCache' }")
+      .rootPath("entities.find { it.name =='testCache' }")
         .body("agentId", equalTo("embedded"))
         .body("cacheManagerName", equalTo("testCacheManager"))
         .body("statName", equalTo("LocalHeapSize"))
@@ -156,7 +155,7 @@ public class CacheStatisticSamplesResourceServiceImplTest extends ResourceServic
     // we precise nothing : we get it all !
     givenStandalone()
     .expect()
-      .contentType(ContentType.JSON)
+      .contentType(ContentType.JSON).rootPath("entities")
       .body("size()", greaterThan(40))
       .statusCode(200)
     .when()
@@ -188,7 +187,7 @@ public class CacheStatisticSamplesResourceServiceImplTest extends ResourceServic
     // we precise the cacheManager, cache and 2 stats we want to retrieve
     givenClustered()
     .expect()
-      .contentType(ContentType.JSON)
+      .contentType(ContentType.JSON).rootPath("entities")
       .body("get(0).agentId", equalTo(cacheManagerMaxBytesAgentId))
       .body("get(0).name", equalTo("testCache2"))
       .body("get(0).cacheManagerName", equalTo("testCacheManagerProgrammatic"))
@@ -206,7 +205,7 @@ public class CacheStatisticSamplesResourceServiceImplTest extends ResourceServic
     // we precise the cache and 2 stats we want to retrieve
     givenClustered()
     .expect()
-      .contentType(ContentType.JSON)
+      .contentType(ContentType.JSON).rootPath("entities")
       .body("get(0).agentId", equalTo(cacheManagerMaxBytesAgentId))
       .body("get(0).name", equalTo("testCache2"))
       .body("get(0).cacheManagerName", equalTo("testCacheManagerProgrammatic"))
@@ -225,15 +224,15 @@ public class CacheStatisticSamplesResourceServiceImplTest extends ResourceServic
     // we precise 2 stats we want to retrieve
     givenClustered()
     .expect()
-      .contentType(ContentType.JSON)
+      .contentType(ContentType.JSON).rootPath("entities")
       .body("size()", is(2))
-      .rootPath("find { it.name =='testCache2' }")
+      .rootPath("entities.find { it.name =='testCache2' }")
         .body("agentId", equalTo(cacheManagerMaxBytesAgentId))
         .body("cacheManagerName", equalTo("testCacheManagerProgrammatic"))
         .body("statName", equalTo("LocalHeapSize"))
         .body("statValueByTimeMillis.size()", greaterThan(0))
         .body("statValueByTimeMillis.values()[0]", greaterThan(0))
-      .rootPath("find { it.name =='testCache' }")
+      .rootPath("entities.  find { it.name =='testCache' }")
         .body("agentId", equalTo(cacheManagerMaxElementsAgentId))
         .body("cacheManagerName", equalTo("testCacheManager"))
         .body("statName", equalTo("LocalHeapSize"))
@@ -247,7 +246,7 @@ public class CacheStatisticSamplesResourceServiceImplTest extends ResourceServic
     // we precise nothing : we get it all !
     givenClustered()
     .expect()
-      .contentType(ContentType.JSON)
+      .contentType(ContentType.JSON).rootPath("entities")
       .body("size()", greaterThan(40))
       .statusCode(200)
     .when()

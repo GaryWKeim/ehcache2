@@ -47,11 +47,6 @@
       <scope>provided</scope>
     </dependency>
     <dependency>
-      <groupId>org.hibernate</groupId>
-      <artifactId>hibernate-core</artifactId>
-      <scope>provided</scope>
-    </dependency>
-    <dependency>
       <groupId>javax.transaction</groupId>
       <artifactId>jta</artifactId>
       <scope>provided</scope>
@@ -76,11 +71,6 @@
     <dependency>
       <groupId>org.codehaus.btm</groupId>
       <artifactId>btm</artifactId>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>net.sf.hibernate</groupId>
-      <artifactId>hibernate</artifactId>
       <scope>test</scope>
     </dependency>
     <dependency>
@@ -109,17 +99,6 @@
       <groupId>org.javassist</groupId>
       <artifactId>javassist</artifactId>
       <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.hibernate</groupId>
-      <artifactId>hibernate-ehcache</artifactId>
-      <scope>test</scope>
-      <exclusions>
-        <exclusion>
-          <artifactId>ehcache</artifactId>
-          <groupId>net.sf.ehcache</groupId>
-        </exclusion>
-      </exclusions>
     </dependency>
     <dependency>
       <groupId>org.apache.derby</groupId>
@@ -452,21 +431,7 @@
     </profile>
   </profiles>
 
-  <!-- The JBoss repository is only here to satisfy the 'provided' dependency
-    on hibernate-core -->
   <repositories>
-    <!--For Hibernate. Test only -->
-    <repository>
-      <id>jboss-releases</id>
-      <url>http://repository.jboss.org/nexus/content/groups/public-jboss</url>
-      <releases>
-        <enabled>true</enabled>
-      </releases>
-      <snapshots>
-        <enabled>false</enabled>
-      </snapshots>
-    </repository>
-
     <!--For xsom. Test only -->
     <repository>
       <id>Java.net Maven 2</id>

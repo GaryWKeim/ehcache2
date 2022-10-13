@@ -37,7 +37,7 @@ import static org.hamcrest.CoreMatchers.equalTo;
  * @author Anthony Dahanne
  */
 public class CacheConfigsResourceServiceImplTest extends ResourceServiceImplITHelper {
-  protected static final String EXPECTED_RESOURCE_LOCATION = "/tc-management-api/agents{agentIds}/cacheManagers{cmIds}/caches{cacheIds}/configs";
+  protected static final String EXPECTED_RESOURCE_LOCATION = "/tc-management-api/v2/agents{agentIds}/cacheManagers{cmIds}/caches{cacheIds}/configs";
 
   @BeforeClass
   public static void setUpCluster() throws Exception {
@@ -63,7 +63,7 @@ public class CacheConfigsResourceServiceImplTest extends ResourceServiceImplITHe
     String xml =
       givenStandalone()
       .expect()
-        .contentType(ContentType.JSON)
+        .contentType(ContentType.JSON).rootPath("entities")
         .body("find { it.cacheManagerName == 'testCacheManagerProgrammatic' }.cacheName", is("testCache2"))
         .body("find { it.cacheManagerName == 'testCacheManager' }.cacheName", is("testCache"))
         .body("[0].agentId", equalTo("embedded"))
@@ -71,7 +71,7 @@ public class CacheConfigsResourceServiceImplTest extends ResourceServiceImplITHe
         .statusCode(200)
       .when()
         .get(EXPECTED_RESOURCE_LOCATION, agentsFilter, cmsFilter, cachesFilter)
-        .jsonPath().get("find { it.cacheManagerName == 'testCacheManager' }.xml").toString();
+        .jsonPath().get("entities.find { it.cacheManagerName == 'testCacheManager' }.xml").toString();
 
     XmlPath xmlPath = new XmlPath(xml);
     Node cache = xmlPath.getNode("cache");
@@ -84,14 +84,14 @@ public class CacheConfigsResourceServiceImplTest extends ResourceServiceImplITHe
 
     String filteredXml = givenStandalone()
       .expect()
-        .contentType(ContentType.JSON)
+        .contentType(ContentType.JSON).rootPath("entities")
         .body("[0].agentId", equalTo("embedded"))
         .body("[0].cacheManagerName", equalTo("testCacheManagerProgrammatic"))
         .body("[0].cacheName", equalTo("testCache2"))
         .statusCode(200)
       .when()
         .get(EXPECTED_RESOURCE_LOCATION, agentsFilter, cmsFilter, cachesFilter)
-        .jsonPath().get("[0].xml").toString();
+        .jsonPath().get("entities[0].xml").toString();
 
     xmlPath = new XmlPath(filteredXml);
     cache = xmlPath.get("cache");
@@ -106,7 +106,7 @@ public class CacheConfigsResourceServiceImplTest extends ResourceServiceImplITHe
 
     String xml = givenClustered()
       .expect()
-        .contentType(ContentType.JSON)
+        .contentType(ContentType.JSON).rootPath("entities")
         .body("find { it.cacheManagerName == 'testCacheManagerProgrammatic' }.agentId", equalTo(cacheManagerMaxBytesAgentId))
         .body("find { it.cacheManagerName == 'testCacheManagerProgrammatic' }.cacheName", is("testCache2"))
         .body("find { it.cacheManagerName == 'testCacheManager' }.cacheName", is("testCache"))
@@ -114,7 +114,7 @@ public class CacheConfigsResourceServiceImplTest extends ResourceServiceImplITHe
         .statusCode(200)
       .when()
         .get(EXPECTED_RESOURCE_LOCATION, agentsFilter, cmsFilter, cachesFilter)
-        .jsonPath().get("find { it.cacheManagerName == 'testCacheManager' }.xml").toString();
+        .jsonPath().get("entities.find { it.cacheManagerName == 'testCacheManager' }.xml").toString();
 
     XmlPath xmlPath = new XmlPath(xml);
     Node cache = xmlPath.getNode("cache");
@@ -126,14 +126,14 @@ public class CacheConfigsResourceServiceImplTest extends ResourceServiceImplITHe
 
     String filteredXml = givenClustered()
       .expect()
-        .contentType(ContentType.JSON)
+        .contentType(ContentType.JSON).rootPath("entities")
         .body("[0].agentId", equalTo(cacheManagerMaxBytesAgentId))
         .body("[0].cacheManagerName", equalTo("testCacheManagerProgrammatic"))
         .body("[0].cacheName", equalTo("testCache2"))
         .statusCode(200)
       .when()
         .get(EXPECTED_RESOURCE_LOCATION, agentsFilter, cmsFilter, cachesFilter)
-        .jsonPath().get("[0].xml").toString();
+        .jsonPath().get("entities[0].xml").toString();
 
     xmlPath = new XmlPath(filteredXml);
     cache = xmlPath.get("cache");
