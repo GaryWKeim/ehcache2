@@ -11,11 +11,10 @@
     because of the LOG guards (if (LOG.isDebugEnabled) { ...) which are there for
     runtime performance.-->
   <suppress checks="CyclomaticComplexity" files="Cache.java"/>
-  <suppress checks="CyclomaticComplexity" files="NonstopConfiguration"/>
+  <suppress checks="CyclomaticComplexity" files="NonstopConfiguration.java"/>
   <suppress checks="CyclomaticComplexity" files="Segment.java"/>
   <suppress checks="CyclomaticComplexity" files="CacheManager.java"/>
   <suppress checks="CyclomaticComplexity" files="CacheManagerSamplerImpl.java"/>
-  <suppress checks="CyclomaticComplexity" files="NonstopExecutorServiceImpl.java"/>
   <suppress checks="FileLength" files="CacheManager.java"/>
   <suppress checks="NPathComplexity" files="Cache.java"/>
   <suppress checks="NPathComplexity" files="CacheManager.java"/>
@@ -69,7 +68,6 @@
   <suppress checks="CyclomaticComplexity" files="AbstractTransactionStore.java"/>
   <suppress checks="NPathComplexity" files="EhcacheXAResourceImpl.java"/>
   <suppress checks="CyclomaticComplexity" files="EhcacheXAResourceImpl.java"/>
-  <suppress checks="ExecutableStatementCount" files="SampledCacheStatisticsImpl.java"/>
   <suppress checks="NPathComplexity" files="ReflectionSizeOf.java"/>
   <suppress checks="CyclomaticComplexity" files="ReflectionSizeOf.java"/>
   <suppress checks="ClassDataAbstractionCoupling" files="DiskStorageFactory.java"/>
@@ -126,7 +124,6 @@
   <suppress checks="JavadocMethod" files="SearchableConfigurationElement.java"/>
   <suppress checks="JavadocMethod" files="SizeOfPolicyConfigurationElement.java"/>
   <suppress checks="JavadocMethod" files="TerracottaConfigConfigurationElement.java"/>
-  <suppress checks="JavadocMethod" files="TerracottaConfigurationElement.java"/>
   <suppress checks="JavadocMethod" files="TimeoutBehaviorConfigurationElement.java"/>
   <suppress checks="JavadocMethod" files="NodeElement.java"/>
   <suppress checks="JavadocMethod" files="SimpleNodeElement.java"/>
@@ -157,59 +154,18 @@
   <suppress checks="JavadocMethod" files="ThreadedWorkQueue.java"/>
   <suppress checks="JavadocMethod" files="ShutdownListener.java"/>
   <suppress checks="JavadocMethod" files="DiskStorePathManager.java"/>
-  <suppress checks="JavadocMethod" files="CacheManagerPeerProvider.java"/>
-  <suppress checks="JavadocMethod" files="CachePeer.java"/>
-  <suppress checks="JavadocMethod" files="EventMessage.java"/>
-  <suppress checks="JavadocMethod" files="LegacyEventMessage.java"/>
   <suppress checks="JavadocMethod" files="Ehcache.java"/>
   <suppress checks="JavadocMethod" files="Element.java"/>
   <suppress checks="JavadocMethod" files="ElementIdHelper.java"/>
   <suppress checks="JavadocMethod" files="RegisteredEventListeners.java"/>
   <suppress checks="JavadocMethod" files="FeaturesManager.java"/>
-  <suppress checks="JavadocMethod" files="EhcacheNonstrictReadWriteCache.java"/>
-  <suppress checks="JavadocMethod" files="EhcacheReadOnlyCache.java"/>
-  <suppress checks="JavadocMethod" files="EhcacheReadWriteCache.java"/>
-  <suppress checks="JavadocMethod" files="EhCacheRegionFactory.java"/>
   <suppress checks="JavadocMethod" files="EhcacheStats.java"/>
-  <suppress checks="JavadocMethod" files="HibernateStats.java"/>
-  <suppress checks="JavadocMethod" files="AggregateCacheRegionStats.java"/>
   <suppress checks="JavadocMethod" files="BaseEmitterBean.java"/>
-  <suppress checks="JavadocMethod" files="BeanUtils.java"/>
-  <suppress checks="JavadocMethod" files="CacheRegionStats.java"/>
-  <suppress checks="JavadocMethod" files="CacheRegionUtils.java"/>
-  <suppress checks="JavadocMethod" files="CollectionStats.java"/>
-  <suppress checks="JavadocMethod" files="EhcacheHibernate.java"/>
   <suppress checks="JavadocMethod" files="EhcacheHibernateMbeanNames.java"/>
-  <suppress checks="JavadocMethod" files="EhcacheHibernateMBeanRegistration.java"/>
-  <suppress checks="JavadocMethod" files="EhcacheHibernateMBeanRegistrationImpl.java"/>
-  <suppress checks="JavadocMethod" files="EhcacheStatsImpl.java"/>
-  <suppress checks="JavadocMethod" files="EntityStats.java"/>
-  <suppress checks="JavadocMethod" files="HibernateStatsImpl.java"/>
-  <suppress checks="JavadocMethod" files="NullHibernateStats.java"/>
-  <suppress checks="JavadocMethod" files="QueryStats.java"/>
-  <suppress checks="JavadocMethod" files="HibernateNonstopCacheExceptionHandler.java"/>
-  <suppress checks="JavadocMethod" files="NonstopAccessStrategyFactory.java"/>
-  <suppress checks="JavadocMethod" files="NonstopAwareCollectionRegionAccessStrategy.java"/>
-  <suppress checks="JavadocMethod" files="NonstopAwareEntityRegionAccessStrategy.java"/>
-  <suppress checks="JavadocMethod" files="EhcacheCollectionRegion.java"/>
-  <suppress checks="JavadocMethod" files="EhcacheDataRegion.java"/>
-  <suppress checks="JavadocMethod" files="EhcacheEntityRegion.java"/>
-  <suppress checks="JavadocMethod" files="EhcacheQueryResultsRegion.java"/>
-  <suppress checks="JavadocMethod" files="EhcacheTimestampsRegion.java"/>
-  <suppress checks="JavadocMethod" files="EhcacheTransactionalDataRegion.java"/>
-  <suppress checks="JavadocMethod" files="SingletonEhCacheRegionFactory.java"/>
-  <suppress checks="JavadocMethod" files="EhcacheAccessStrategyFactory.java"/>
-  <suppress checks="JavadocMethod" files="NonStrictReadWriteEhcacheCollectionRegionAccessStrategy.java"/>
-  <suppress checks="JavadocMethod" files="NonStrictReadWriteEhcacheEntityRegionAccessStrategy.java"/>
-  <suppress checks="JavadocMethod" files="ReadOnlyEhcacheCollectionRegionAccessStrategy.java"/>
-  <suppress checks="JavadocMethod" files="ReadOnlyEhcacheEntityRegionAccessStrategy.java"/>
-  <suppress checks="JavadocMethod" files="ReadWriteEhcacheCollectionRegionAccessStrategy.java"/>
-  <suppress checks="JavadocMethod" files="ReadWriteEhcacheEntityRegionAccessStrategy.java"/>
   <suppress checks="JavadocMethod" files="CacheLoader.java"/>
   <suppress checks="JavadocMethod" files="CacheConfigurationMBean.java"/>
   <suppress checks="JavadocMethod" files="CacheManagerMBean.java"/>
   <suppress checks="JavadocMethod" files="DevModeClassLoader.java"/>
-  <suppress checks="JavadocMethod" files="ManagedCacheManagerPeerProvider.java"/>
   <suppress checks="JavadocMethod" files="ManagementService.java"/>
   <suppress checks="JavadocMethod" files="MBeanRegistrationProvider.java"/>
   <suppress checks="JavadocMethod" files="MBeanRegistrationProviderException.java"/>
@@ -275,7 +231,7 @@
   <suppress checks="JavadocMethod" files="ImmutableValueElementCopyStrategy.java"/>
   <suppress checks="JavadocMethod" files="ReadWriteCopyStrategy.java"/>
   <suppress checks="JavadocMethod" files="ReadWriteSerializationCopyStrategy.java"/>
-  <suppress checks="JavadocMethod" files="SerializationCopyStrategy.java"/>
+  <suppress checks="JavadocMethod" files="ReadWriteSerializationCopyStrategy.java"/>
   <suppress checks="JavadocMethod" files="CopyStrategyHandler.java"/>
   <suppress checks="JavadocMethod" files="DiskStorageFactory.java"/>
   <suppress checks="JavadocMethod" files="AATreeSet.java"/>
@@ -336,12 +292,9 @@
   <suppress checks="JavadocMethod" files="LegacyStoreWrapper.java"/>
   <suppress checks="JavadocMethod" files="CastingOperationConverter.java"/>
   <suppress checks="JavadocMethod" files="DeleteOperation.java"/>
-  <suppress checks="JavadocMethod" files="WriteOperation.java"/>  
-  <suppress checks="JavadocMethod" files="CacheManagerPeerListener.java"/>
+  <suppress checks="JavadocMethod" files="WriteOperation.java"/>
   <suppress checks="JavadocMethod" files="CacheEventListener.java"/>
   <suppress checks="JavadocMethod" files="CacheExtension.java"/>
-  <suppress checks="JavadocMethod" files="EhCacheProvider.java"/>
-  <suppress checks="JavadocMethod" files="SingletonEhCacheProvider.java"/>
   <suppress checks="JavadocMethod" files="DynamicSearchChecker.java"/>
   <suppress checks="JavadocMethod" files="Results.java"/>
   <suppress checks="JavadocMethod" files="CacheWriterManager.java"/>
@@ -366,8 +319,6 @@
   <suppress checks="LineLength" files="Configuration.java"/>
   <suppress checks="LineLength" files="BlockingCache.java"/>
   <suppress checks="LineLength" files="Ehcache.java"/>
-  <suppress checks="LineLength" files="NullHibernateStats.java"/>
-  <suppress checks="LineLength" files="AbstractReadWriteEhcacheAccessStrategy.java"/>
   <suppress checks="LineLength" files="ManagementService.java"/>
   <suppress checks="LineLength" files="CacheSamplerImpl.java"/>
   <suppress checks="LineLength" files="AnnotationProxyFactory.java"/>
@@ -379,7 +330,6 @@
   <suppress checks="LineLength" files="CacheWriter.java"/>
 
   <suppress checks="HideUtilityClassConstructor" files="ElementIdHelper.java"/>
-  <suppress checks="HideUtilityClassConstructor" files="BeanUtils.java"/>
   <suppress checks="HideUtilityClassConstructor" files="ManagementServerLoader.java"/>
   <suppress checks="HideUtilityClassConstructor" files="Utils.java"/>
   <suppress checks="HideUtilityClassConstructor" files="AgentLoader.java"/>
