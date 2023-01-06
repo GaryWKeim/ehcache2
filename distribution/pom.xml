@@ -16,7 +16,6 @@
   
   <modules>
     <module>colorcache</module>
-    <module>events</module>
   </modules>
   
   <properties>
