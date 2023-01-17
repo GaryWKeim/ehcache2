@@ -39,7 +39,7 @@ import static org.hamcrest.CoreMatchers.equalTo;
  * @author Anthony Dahanne
  */
 public class CacheManagerConfigsResourceServiceImplTest extends ResourceServiceImplITHelper {
-  protected static final String EXPECTED_RESOURCE_LOCATION = "/tc-management-api/agents{agentIds}/cacheManagers{cmIds}/configs";
+  protected static final String EXPECTED_RESOURCE_LOCATION = "/tc-management-api/v2/agents{agentIds}/cacheManagers{cmIds}/configs";
 
   @BeforeClass
   public static void setUpCluster() throws Exception {
@@ -63,13 +63,13 @@ public class CacheManagerConfigsResourceServiceImplTest extends ResourceServiceI
 
     String xml = givenStandalone()
       .expect()
-        .contentType(ContentType.JSON)
+        .contentType(ContentType.JSON).rootPath("entities")
         .body("find { it.cacheManagerName == 'testCacheManagerProgrammatic' }.agentId", equalTo("embedded"))
         .body("find { it.cacheManagerName == 'testCacheManager' }.agentId", equalTo("embedded"))
         .statusCode(200)
       .when()
         .get(EXPECTED_RESOURCE_LOCATION, agentsFilter, cmsFilter)
-        .jsonPath().get("find { it.cacheManagerName == 'testCacheManagerProgrammatic' }.xml").toString();
+        .jsonPath().get("entities.find { it.cacheManagerName == 'testCacheManagerProgrammatic' }.xml").toString();
 
     XmlPath xmlPath = new XmlPath(xml);
     Node cacheManager = xmlPath.getNode("ehcache");
@@ -91,13 +91,13 @@ public class CacheManagerConfigsResourceServiceImplTest extends ResourceServiceI
 
     String filteredXml = givenStandalone()
       .expect()
-        .contentType(ContentType.JSON)
+        .contentType(ContentType.JSON).rootPath("entities")
         .body("[0].agentId", equalTo("embedded"))
         .body("[0].cacheManagerName", equalTo("testCacheManager"))
         .statusCode(200)
       .when()
         .get(EXPECTED_RESOURCE_LOCATION, agentsFilter, cmsFilter)
-        .jsonPath().get("[0].xml").toString();
+        .jsonPath().get("entities[0].xml").toString();
 
     xmlPath = new XmlPath(filteredXml);
 
@@ -124,13 +124,13 @@ public class CacheManagerConfigsResourceServiceImplTest extends ResourceServiceI
 
     String xml = givenClustered()
       .expect()
-        .contentType(ContentType.JSON)
+        .contentType(ContentType.JSON).rootPath("entities")
         .body("find { it.cacheManagerName == 'testCacheManagerProgrammatic' }.agentId", equalTo(cacheManagerMaxBytesAgentId))
         .body("find { it.cacheManagerName == 'testCacheManager' }.agentId", equalTo(cacheManagerMaxElementsAgentId))
         .statusCode(200)
       .when()
         .get(EXPECTED_RESOURCE_LOCATION, agentsFilter, cmsFilter)
-        .jsonPath().get("find { it.cacheManagerName == 'testCacheManagerProgrammatic' }.xml").toString();
+        .jsonPath().get("entities.find { it.cacheManagerName == 'testCacheManagerProgrammatic' }.xml").toString();
 
     XmlPath xmlPath = new XmlPath(xml);
     Node cacheManager = xmlPath.getNode("ehcache");
@@ -152,13 +152,13 @@ public class CacheManagerConfigsResourceServiceImplTest extends ResourceServiceI
 
     String filteredXml = givenClustered()
       .expect()
-        .contentType(ContentType.JSON)
+        .contentType(ContentType.JSON).rootPath("entities")
         .body("[0].agentId", equalTo(cacheManagerMaxElementsAgentId))
         .body("[0].cacheManagerName", equalTo("testCacheManager"))
         .statusCode(200)
       .when()
         .get(EXPECTED_RESOURCE_LOCATION, agentsFilter, cmsFilter)
-        .jsonPath().get("[0].xml").toString();
+        .jsonPath().get("entities[0].xml").toString();
 
     xmlPath = new XmlPath(filteredXml);
 

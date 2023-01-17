@@ -103,8 +103,8 @@ public abstract class ResourceServiceImplITHelper {
     while (true) {
       try {
         String response = givenClustered()
-          .get("/tc-management-api/agents/cacheManagers").asString();
-        String agentId = from(response).get("find{it.attributes.ClusterUUID == '" + clusterUuid + "'}.agentId");
+          .get("/tc-management-api/v2/agents/cacheManagers/").asString();
+        String agentId = from(response).get("entities.find { it.attributes.ClusterUUID == '" + clusterUuid + "' }.agentId");
         if (agentId != null) {
           return agentId;
         }

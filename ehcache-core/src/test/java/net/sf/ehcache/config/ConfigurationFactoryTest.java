@@ -37,7 +37,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.net.URL;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -52,19 +51,9 @@ import net.sf.ehcache.Cache;
 import net.sf.ehcache.CacheException;
 import net.sf.ehcache.CacheManager;
 import net.sf.ehcache.Ehcache;
-import net.sf.ehcache.bootstrap.BootstrapCacheLoader;
 import net.sf.ehcache.config.PersistenceConfiguration.Strategy;
 import net.sf.ehcache.config.TerracottaConfiguration.Consistency;
-import net.sf.ehcache.distribution.CacheManagerPeerListener;
-import net.sf.ehcache.distribution.CacheManagerPeerProvider;
-import net.sf.ehcache.distribution.MulticastRMICacheManagerPeerProvider;
-import net.sf.ehcache.distribution.RMIAsynchronousCacheReplicator;
-import net.sf.ehcache.distribution.RMIBootstrapCacheLoader;
-import net.sf.ehcache.distribution.RMICacheManagerPeerListener;
-import net.sf.ehcache.distribution.RMICacheReplicatorFactory;
-import net.sf.ehcache.event.CacheEventListener;
 import net.sf.ehcache.event.CacheManagerEventListener;
-import net.sf.ehcache.event.CountingCacheEventListener;
 import net.sf.ehcache.event.CountingCacheManagerEventListener;
 import net.sf.ehcache.event.NotificationScope;
 import net.sf.ehcache.exceptionhandler.CacheExceptionHandler;
@@ -90,7 +79,7 @@ import org.slf4j.LoggerFactory;
  * @version $Id$
  */
 public class ConfigurationFactoryTest extends AbstractCacheTest {
-    private static final int CACHES_IN_TEST_EHCACHE = 15;
+    private static final int CACHES_IN_TEST_EHCACHE = 14;
 
     private static final Logger LOG = LoggerFactory.getLogger(ConfigurationFactoryTest.class.getName());
 
@@ -131,15 +120,6 @@ public class ConfigurationFactoryTest extends AbstractCacheTest {
         //Check disk store
         assertEquals(System.getProperty("java.io.tmpdir"), configurationHelper.getDiskStorePath());
 
-
-        //Check CacheManagerPeerProvider
-        Map<String, CacheManagerPeerProvider> peerProviders = configurationHelper.createCachePeerProviders();
-        CacheManagerPeerProvider peerProvider = peerProviders.get("RMI");
-
-
-        //Check TTL
-        assertTrue(peerProvider instanceof MulticastRMICacheManagerPeerProvider);
-        assertEquals(Integer.valueOf(0), ((MulticastRMICacheManagerPeerProvider) peerProvider).getHeartBeatSender().getTimeToLive());
 
         //Check CacheManagerEventListener
         assertEquals(null, configurationHelper.createCacheManagerEventListener(null));
@@ -241,16 +221,6 @@ public class ConfigurationFactoryTest extends AbstractCacheTest {
         //Check disk store  <diskStore path="/tmp"/>
         assertEquals(System.getProperty("java.io.tmpdir"), configurationHelper.getDiskStorePath());
 
-        //Check CacheManagerPeerProvider
-        Map<String, CacheManagerPeerProvider> peerProviders = configurationHelper.createCachePeerProviders();
-        CacheManagerPeerProvider peerProvider = peerProviders.get("RMI");
-
-
-        //Check TTL
-        assertTrue(peerProvider instanceof MulticastRMICacheManagerPeerProvider);
-        assertEquals(Integer.valueOf(1), ((MulticastRMICacheManagerPeerProvider) peerProvider).getHeartBeatSender().getTimeToLive());
-
-
         //Check default cache
         Ehcache defaultCache = configurationHelper.createDefaultCache();
         assertEquals("default", defaultCache.getName());
@@ -262,7 +232,7 @@ public class ConfigurationFactoryTest extends AbstractCacheTest {
         assertEquals(10000000, defaultCache.getCacheConfiguration().getMaxElementsOnDisk());
 
         //Check caches
-        assertEquals(6, configurationHelper.createCaches().size());
+        assertEquals(3, configurationHelper.createCaches().size());
 
         //check config
         CacheConfiguration sampleCache1Config = configuration.getCacheConfigurations().get("sampleCache1");
@@ -438,86 +408,6 @@ public class ConfigurationFactoryTest extends AbstractCacheTest {
         registeredListeners = persistentLongExpiryIntervalCache.getCacheEventNotificationService()
                 .getCacheEventListeners();
         assertEquals(1, registeredListeners.size());
-    }
-
-    /**
-     * Tests for Distributed Cache config
-     */
-    @Test
-    public void testLoadConfigurationFromFileDistribution() throws Exception {
-        File file = new File(TEST_CONFIG_DIR + "distribution/ehcache-distributed.xml");
-        Configuration configuration = ConfigurationFactory.parseConfiguration(file);
-        ConfigurationHelper configurationHelper = new ConfigurationHelper(manager, configuration);
-
-        //Check CacheManagerPeerProvider
-        Map<String, CacheManagerPeerProvider> peerProviders = configurationHelper.createCachePeerProviders();
-        CacheManagerPeerProvider peerProvider = peerProviders.get("RMI");
-
-
-        //Check TTL
-        assertTrue(peerProvider instanceof MulticastRMICacheManagerPeerProvider);
-        assertEquals(Integer.valueOf(0), ((MulticastRMICacheManagerPeerProvider) peerProvider).getHeartBeatSender().getTimeToLive());
-
-
-        //check CacheManagerPeerListener
-        Map<String, CacheManagerPeerListener> peerListeners = configurationHelper.createCachePeerListeners();
-
-        //should be one in this config
-        for (CacheManagerPeerListener peerListener : peerListeners.values()) {
-            assertTrue(peerListener instanceof RMICacheManagerPeerListener);
-        }
-
-        //Check caches. Configuration should have completed
-        assertEquals(5, configurationHelper.createCaches().size());
-
-        Ehcache sampleCache1 = configurationHelper.createCacheFromName("sampleCache1");
-        Set listeners = sampleCache1.getCacheEventNotificationService().getCacheEventListeners();
-        assertEquals(2, listeners.size());
-        for (Iterator iterator = listeners.iterator(); iterator.hasNext();) {
-            CacheEventListener cacheEventListener = (CacheEventListener) iterator.next();
-            assertTrue(cacheEventListener instanceof RMIAsynchronousCacheReplicator || cacheEventListener
-                    instanceof CountingCacheEventListener);
-        }
-
-        BootstrapCacheLoader bootstrapCacheLoader = sampleCache1.getBootstrapCacheLoader();
-        assertNotNull(bootstrapCacheLoader);
-        assertEquals(RMIBootstrapCacheLoader.class, bootstrapCacheLoader.getClass());
-        assertEquals(true, bootstrapCacheLoader.isAsynchronous());
-        assertEquals(5000000, ((RMIBootstrapCacheLoader) bootstrapCacheLoader).getMaximumChunkSizeBytes());
-
-    }
-
-    /**
-     * The following should give defaults of true and 5000000
-     * <bootstrapCacheLoaderFactory class="net.sf.ehcache.distribution.RMIBootstrapCacheLoaderFactory" />
-     */
-    @Test
-    public void testLoadConfigurationFromFileNoBootstrapPropertiesSet() throws Exception {
-        File file = new File(TEST_CONFIG_DIR + "distribution/ehcache-distributed.xml");
-        Configuration configuration = ConfigurationFactory.parseConfiguration(file);
-        ConfigurationHelper configurationHelper = new ConfigurationHelper(manager, configuration);
-        Ehcache sampleCache3 = configurationHelper.createCacheFromName("sampleCache3");
-
-        BootstrapCacheLoader bootstrapCacheLoader = ((Cache) sampleCache3).getBootstrapCacheLoader();
-        assertEquals(true, bootstrapCacheLoader.isAsynchronous());
-        assertEquals(5000000, ((RMIBootstrapCacheLoader) bootstrapCacheLoader).getMaximumChunkSizeBytes());
-    }
-
-    /**
-     * The following should give defaults of true and 5000000
-     * <bootstrapCacheLoaderFactory class="net.sf.ehcache.distribution.RMIBootstrapCacheLoaderFactory"
-     * properties="bootstrapAsynchronously=false, maximumChunkSizeBytes=10000"/>
-     */
-    @Test
-    public void testLoadConfigurationFromFileWithSpecificPropertiesSet() throws Exception {
-        File file = new File(TEST_CONFIG_DIR + "distribution/ehcache-distributed.xml");
-        Configuration configuration = ConfigurationFactory.parseConfiguration(file);
-        ConfigurationHelper configurationHelper = new ConfigurationHelper(manager, configuration);
-        Ehcache sampleCache4 = configurationHelper.createCacheFromName("sampleCache4");
-
-        BootstrapCacheLoader bootstrapCacheLoader = ((Cache) sampleCache4).getBootstrapCacheLoader();
-        assertEquals(false, bootstrapCacheLoader.isAsynchronous());
-        assertEquals(10000, ((RMIBootstrapCacheLoader) bootstrapCacheLoader).getMaximumChunkSizeBytes());
     }
 
     /**
@@ -699,23 +589,6 @@ public class ConfigurationFactoryTest extends AbstractCacheTest {
     }
 
     /**
-     * Regression test for bug 1432074 - NullPointer on RMICacheManagerPeerProviderFactory
-     * If manual peer provider configuration is selected then an info message should be
-     * logged if there is no list.
-     */
-    @Test
-    public void testEmptyPeerListManualDistributedConfiguration() {
-        Configuration config = ConfigurationFactory.parseConfiguration(
-                new File(TEST_CONFIG_DIR + "distribution/ehcache-manual-distributed3.xml")).name("new-name");
-        CacheManager cacheManager = new CacheManager(config);
-        assertEquals(0, cacheManager.getCacheManagerPeerProvider("RMI")
-                .listRemoteCachePeers(cacheManager.getCache("sampleCache1")).size());
-        cacheManager.shutdown();
-
-    }
-
-
-    /**
      * Tests that the loader successfully loads from ehcache.xml
      * given as an {@link URL}.
      * <p>
@@ -887,7 +760,7 @@ public class ConfigurationFactoryTest extends AbstractCacheTest {
         assertEquals(Strategy.LOCALTEMPSWAP, defaultCache.getCacheConfiguration().getPersistenceConfiguration().getStrategy());
 
         //Check caches
-        assertEquals(6, configurationHelper.createCaches().size());
+        assertEquals(3, configurationHelper.createCaches().size());
 
         //  <cache name="sampleCache1"
         //  maxElementsInMemory="10000"
@@ -983,7 +856,6 @@ public class ConfigurationFactoryTest extends AbstractCacheTest {
      */
     @Test
     public void testLoadConfigurationWithReplacement() throws Exception {
-        System.setProperty("multicastGroupPort", "4446");
         System.setProperty("serverAndPort", "server.com:9510");
         File file = new File(TEST_CONFIG_DIR + "ehcache-replacement.xml");
         Configuration configuration = ConfigurationFactory.parseConfiguration(file);
@@ -992,10 +864,7 @@ public class ConfigurationFactoryTest extends AbstractCacheTest {
 
         //Check disk path  <diskStore path="/tmp"/>
         assertNotSame(System.getProperty("java.io.tmpdir"), configurationHelper.getDiskStorePath());
-        assertTrue(configuration.getCacheManagerPeerProviderFactoryConfiguration().get(0)
-                .getProperties().indexOf("multicastGroupPort=4446") != -1);
-
-
+        assertTrue(configuration.getTerracottaConfiguration().getUrl().equals("server.com:9510"));
     }
 
 
@@ -1024,21 +893,6 @@ public class ConfigurationFactoryTest extends AbstractCacheTest {
      */
     @Test
     public void testMatchPropertyTokensProperlyFormed() {
-        String example = "<cacheManagerPeerProviderFactory class=\"net.sf.ehcache.distribution.RMICacheManagerPeerProviderFactory\"" +
-                "properties=\"peerDiscovery=automatic, " +
-                "multicastGroupAddress=${multicastAddress}, " +
-                "multicastGroupPort=4446, timeToLive=1\"/>";
-        Set propertyTokens = ConfigurationFactory.extractPropertyTokens(example);
-        assertEquals(1, propertyTokens.size());
-        String firstPropertyToken = (String) (propertyTokens.toArray())[0];
-        assertEquals("${multicastAddress}", firstPropertyToken);
-    }
-
-    /**
-     * Tests the property token extraction logic
-     */
-    @Test
-    public void testMatchPropertyTokensProperlyFormedUrl() {
         String example = "<terracottaConfig url=\"${serverAndPort}\"/>";
         Set propertyTokens = ConfigurationFactory.extractPropertyTokens(example);
         assertEquals(1, propertyTokens.size());
@@ -1052,14 +906,11 @@ public class ConfigurationFactoryTest extends AbstractCacheTest {
      */
     @Test
     public void testMatchPropertyTokensProperlyFormedTwo() {
-        String example = "<cacheManagerPeerProviderFactory class=\"net.sf.ehcache.distribution.RMICacheManagerPeerProviderFactory\"" +
-                "properties=\"peerDiscovery=automatic, " +
-                "multicastGroupAddress=${multicastAddress}\n, " +
-                "multicastGroupPort=4446, timeToLive=${multicastAddress}\"/>";
+        String example = "<terracottaConfig url=\"${serverAndPort}-blah-${serverAndPort}\"/>";
         Set propertyTokens = ConfigurationFactory.extractPropertyTokens(example);
         assertEquals(1, propertyTokens.size());
         String firstPropertyToken = (String) (propertyTokens.toArray())[0];
-        assertEquals("${multicastAddress}", firstPropertyToken);
+        assertEquals("${serverAndPort}", firstPropertyToken);
     }
 
 
@@ -1068,10 +919,7 @@ public class ConfigurationFactoryTest extends AbstractCacheTest {
      */
     @Test
     public void testMatchPropertyTokensProperlyFormedTwoUnique() {
-        String example = "<cacheManagerPeerProviderFactory class=\"net.sf.ehcache.distribution.RMICacheManagerPeerProviderFactory\"" +
-                "properties=\"peerDiscovery=automatic, " +
-                "multicastGroupAddress=${multicastAddress}\n, " +
-                "multicastGroupPort=4446, timeToLive=${multicastAddress1}\"/>";
+        String example = "<terracottaConfig url=\"${serverAndPort1}-blah-${serverAndPort2}\"/>";
         Set propertyTokens = ConfigurationFactory.extractPropertyTokens(example);
         assertEquals(2, propertyTokens.size());
     }
@@ -1081,10 +929,7 @@ public class ConfigurationFactoryTest extends AbstractCacheTest {
      */
     @Test
     public void testMatchPropertyTokensNotClosed() {
-        String example = "<cacheManagerPeerProviderFactory class=\"net.sf.ehcache.distribution.RMICacheManagerPeerProviderFactory\"" +
-                "properties=\"peerDiscovery=automatic, " +
-                "multicastGroupAddress=${multicastAddress\n, " +
-                "multicastGroupPort=4446, timeToLive=${multicastAddress\"/>";
+        String example = "<terracottaConfig url=\"${serverAndPort\"/>";
         Set propertyTokens = ConfigurationFactory.extractPropertyTokens(example);
         assertEquals(0, propertyTokens.size());
     }
@@ -1423,45 +1268,6 @@ public class ConfigurationFactoryTest extends AbstractCacheTest {
         } catch (CacheException e) {
             assertTrue(e.getMessage().contains("diskPersistent isn't supported for a clustered Terracotta cache"));
         }
-    }
-
-    /**
-     * Test valid combination of replicated and terracotta ehcache.xml
-     */
-    @Test
-    public void testTerracottaConfigRMIReplication() {
-        File file = new File(TEST_CONFIG_DIR + "terracotta/ehcache-terracotta-rmi.xml");
-        Configuration configuration = ConfigurationFactory.parseConfiguration(file);
-        List configs = configuration.getCacheConfigurations().get("clustered").getCacheEventListenerConfigurations();
-        assertEquals(1, configs.size());
-        assertEquals(((CacheConfiguration.CacheEventListenerFactoryConfiguration) configs.get(0)).getFullyQualifiedClassPath(),
-                RMICacheReplicatorFactory.class.getName());
-    }
-
-    /**
-     * Test valid combination of replicated and terracotta ehcache.xml
-     */
-    @Test
-    public void testTerracottaConfigJGroupsReplication() {
-        File file = new File(TEST_CONFIG_DIR + "terracotta/ehcache-terracotta-jgroups.xml");
-        Configuration configuration = ConfigurationFactory.parseConfiguration(file);
-        List configs = configuration.getCacheConfigurations().get("clustered").getCacheEventListenerConfigurations();
-        assertEquals(1, configs.size());
-        assertEquals(((CacheConfiguration.CacheEventListenerFactoryConfiguration) configs.get(0)).getFullyQualifiedClassPath(),
-                "net.sf.ehcache.distribution.JGroupsCacheReplicatorFactory");
-    }
-
-    /**
-     * Test valid combination of replicated and terracotta ehcache.xml
-     */
-    @Test
-    public void testTerracottaInvalidConfig5() {
-        File file = new File(TEST_CONFIG_DIR + "terracotta/ehcache-terracotta-jms.xml");
-        Configuration configuration = ConfigurationFactory.parseConfiguration(file);
-        List configs = configuration.getCacheConfigurations().get("clustered").getCacheEventListenerConfigurations();
-        assertEquals(1, configs.size());
-        assertEquals(((CacheConfiguration.CacheEventListenerFactoryConfiguration) configs.get(0)).getFullyQualifiedClassPath(),
-                "net.sf.ehcache.distribution.JMSCacheReplicatorFactory");
     }
 
     private String removeLotsOfWhitespace(String str) {

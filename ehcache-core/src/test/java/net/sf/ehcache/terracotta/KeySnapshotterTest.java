@@ -158,7 +158,7 @@ public class KeySnapshotterTest {
 
     @Test
     public void testDisposesProperlyButFinishes() throws BrokenBarrierException, InterruptedException, IOException {
-        CacheManager manager = new CacheManager(new Configuration().name("testDisposesProperlyImmediately"));
+        CacheManager manager = new CacheManager(new Configuration().name("testDisposesProperlyButFinishes"));
         try {
             deleteFolder(new File(DUMPS_DIRECTORY));
             final RotatingSnapshotFile rotatingSnapshotFile = new RotatingSnapshotFile(new DiskStorePathManager(DUMPS_DIRECTORY), "testingInterruptFinishes", getClass().getClassLoader());

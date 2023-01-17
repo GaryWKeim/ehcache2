@@ -359,7 +359,7 @@ public interface Store {
      *
      * @param coherent
      *            true transitions to coherent mode, false to incoherent mode
-     * @throws UnsupportedOperationException if this store does not support cache coherence, like RMI replication
+     * @throws UnsupportedOperationException if this store does not support cache coherence
      * @since 2.0
      */
     public void setNodeCoherent(boolean coherent) throws UnsupportedOperationException, TerracottaNotRunningException;
@@ -369,7 +369,7 @@ public interface Store {
      * immediately
      * <p>
      * It applies to coherent clustering mechanisms only e.g. Terracotta
-     * @throws UnsupportedOperationException if this store does not support cache coherence, like RMI replication
+     * @throws UnsupportedOperationException if this store does not support cache coherence
      * @throws InterruptedException
      * @since 2.0
      */

@@ -111,7 +111,7 @@ public class SimpleOsgiTest {
       Cache testCache = manager.getCache("testCache");
       testCache.put(new Element("k", "v"));
       assertEquals(1, testCache.getSize());
-      URL url = new URL("http://localhost:9888/tc-management-api/agents");
+      URL url = new URL("http://localhost:9888/tc-management-api/v2/agents");
       in = url.openStream();
       BufferedReader reader = new BufferedReader(new InputStreamReader(in));
       String line = null;

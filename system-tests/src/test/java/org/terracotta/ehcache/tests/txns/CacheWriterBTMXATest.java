@@ -21,7 +21,6 @@ import org.apache.derby.client.ClientDataSourceFactory;
 import org.apache.derby.drda.NetServlet;
 import org.apache.derby.iapi.tools.ToolUtils;
 import org.apache.derby.impl.db.BasicDatabase;
-import org.hibernate.dialect.DerbyDialect;
 import org.terracotta.test.util.TestBaseUtil;
 
 import java.util.List;
@@ -36,7 +35,6 @@ public class CacheWriterBTMXATest extends AbstractBTMCacheTest {
   @Override
   protected List<String> getExtraJars() {
     List<String> extraJars = super.getExtraJars();
-    extraJars.add(TestBaseUtil.jarFor(DerbyDialect.class)); // hibernate
     extraJars.add(TestBaseUtil.jarFor(BasicDatabase.class)); // derby
     extraJars.add(TestBaseUtil.jarFor(ToolUtils.class)); // derbytools
     extraJars.add(TestBaseUtil.jarFor(NetServlet.class)); // derbynet

@@ -30,7 +30,9 @@ import java.io.UnsupportedEncodingException;
 
 import static io.restassured.RestAssured.expect;
 import static io.restassured.RestAssured.given;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.is;
 
 /**
  * The aim of this test is to check via HTTP that the ehcache standalone agent /tc-management-api/agents/cacheManagers/caches/elements endpoint
@@ -39,7 +41,7 @@ import static org.hamcrest.Matchers.equalTo;
  * @author Anthony Dahanne
  */
 public class ElementsResourceServiceImplTest extends ResourceServiceImplITHelper {
-  protected static final String EXPECTED_RESOURCE_LOCATION = "/tc-management-api/agents{agentIds}/cacheManagers{cmIds}/caches{cacheIds}/elements";
+  protected static final String EXPECTED_RESOURCE_LOCATION = "/tc-management-api/v2/agents{agentIds}/cacheManagers{cmIds}/caches{cacheIds}/elements";
 
   @BeforeClass
   public static void setUpCluster() throws Exception {
@@ -76,7 +78,7 @@ public class ElementsResourceServiceImplTest extends ResourceServiceImplITHelper
     .expect()
       .statusCode(400)
       .body("details", equalTo(""))
-      .body("error", equalTo("No cache manager specified. Unsafe requests must specify a single cache manager name."))
+      .body("error", equalTo("No cache specified. Unsafe requests must specify a single cache name."))
     .when()
       .delete(EXPECTED_RESOURCE_LOCATION, agentsFilter, cmsFilter, cachesFilter);
   }
@@ -93,15 +95,7 @@ public class ElementsResourceServiceImplTest extends ResourceServiceImplITHelper
       exampleCache.put(new Element("key" + i, "value" + i));
     }
 
-    givenStandalone()
-    .expect()
-      .contentType(ContentType.JSON)
-      .rootPath("find { it.name == 'testCache2' }")
-        .body("agentId", equalTo("embedded"))
-        .body("attributes.InMemorySize", equalTo(1000))
-      .statusCode(200)
-    .when()
-      .get("/tc-management-api/agents/cacheManagers/caches");
+    assertThat(exampleCache.getSize(), is(1000));
 
     String agentsFilter = "";
     String cachesFilter = ";names=testCache2";
@@ -113,15 +107,7 @@ public class ElementsResourceServiceImplTest extends ResourceServiceImplITHelper
     .when()
       .delete(EXPECTED_RESOURCE_LOCATION, agentsFilter, cmsFilter, cachesFilter);
 
-    givenStandalone()
-    .expect()
-      .contentType(ContentType.JSON)
-      .rootPath("find { it.name == 'testCache2' }")
-        .body("agentId", equalTo("embedded"))
-        .body("attributes.InMemorySize", equalTo(0))
-      .statusCode(200)
-    .when()
-      .get("/tc-management-api/agents/cacheManagers/caches");
+    assertThat(exampleCache.getSize(), is(0));
   }
 
   @Test
@@ -137,15 +123,7 @@ public class ElementsResourceServiceImplTest extends ResourceServiceImplITHelper
     }
     final String agentsFilter = ";ids=" + cacheManagerMaxBytesAgentId;
 
-    givenClustered()
-    .expect()
-      .contentType(ContentType.JSON)
-      .rootPath("find { it.name == 'testCache2' }")
-        .body("agentId", equalTo(cacheManagerMaxBytesAgentId))
-        .body("attributes.InMemorySize", equalTo(1000))
-      .statusCode(200)
-    .when()
-      .get("/tc-management-api/agents" + agentsFilter + "/cacheManagers/caches");
+    assertThat(exampleCache.getSize(), is(1000));
 
     String cachesFilter = ";names=testCache2";
     String cmsFilter = ";names=testCacheManagerProgrammatic";
@@ -156,15 +134,7 @@ public class ElementsResourceServiceImplTest extends ResourceServiceImplITHelper
     .when()
       .delete(EXPECTED_RESOURCE_LOCATION, agentsFilter, cmsFilter, cachesFilter);
 
-    givenClustered()
-    .expect()
-      .contentType(ContentType.JSON)
-      .rootPath("find { it.name == 'testCache2' }")
-        .body("agentId", equalTo(cacheManagerMaxBytesAgentId))
-        .body("attributes.InMemorySize", equalTo(0))
-      .statusCode(200)
-    .when()
-      .get("/tc-management-api/agents" + agentsFilter + "/cacheManagers/caches");
+    assertThat(exampleCache.getSize(), is(0));
   }
 
   @After

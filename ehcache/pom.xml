@@ -52,11 +52,6 @@
     </dependency>
     <dependency>
       <groupId>net.sf.ehcache.internal</groupId>
-      <artifactId>ehcache-scheduled-refresh</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>net.sf.ehcache.internal</groupId>
       <artifactId>ehcache-search-parser</artifactId>
       <version>${project.version}</version>
     </dependency>
@@ -86,28 +81,9 @@
       <scope>test</scope>
     </dependency>
     <dependency>
-      <groupId>org.quartz-scheduler</groupId>
-      <artifactId>quartz</artifactId>
-      <version>2.2.3</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-jdk14</artifactId>
       <scope>test</scope>
-      <exclusions>
-        <exclusion>
-          <groupId>org.hibernate</groupId>
-          <artifactId>hibernate-core</artifactId>
-        </exclusion>
-      </exclusions>
-    </dependency>
-
-    <!-- this is only here to resolve the version number in gmavenplus plugin, used by javadoc below -->
-    <dependency>
-      <groupId>org.hibernate</groupId>
-      <artifactId>hibernate-core</artifactId>
-      <scope>provided</scope>
     </dependency>
   </dependencies>
 
@@ -190,6 +166,8 @@
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-dependency-plugin</artifactId>
+            <!-- version 2.8 needed-->
+            <version>2.8</version>
             <executions>
               <execution>
                 <id>list-dependencies</id>
@@ -217,11 +195,6 @@
       </activation>
       <build>
         <plugins>
-          <!-- look up hibernate-core.version -->
-          <plugin>
-            <groupId>org.codehaus.gmavenplus</groupId>
-            <artifactId>gmavenplus-plugin</artifactId>
-          </plugin>
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-javadoc-plugin</artifactId>
@@ -240,9 +213,9 @@
                       <version>4.0.1</version>
                     </additionalDependency>
                     <additionalDependency>
-                      <groupId>org.hibernate</groupId>
-                      <artifactId>hibernate-core</artifactId>
-                      <version>${hibernate-core.version}</version>
+                      <groupId>javax.transaction</groupId>
+                      <artifactId>jta</artifactId>
+                      <version>1.1</version>
                     </additionalDependency>
                   </additionalDependencies>
                   <detectJavaApiLink>false</detectJavaApiLink>
@@ -365,10 +338,7 @@
                   javax.xml.transform.dom;resolution:=optional,
                   javax.xml.transform.stream;resolution:=optional,
                   org.w3c.dom;resolution:=optional,
-                  org.hibernate.*;resolution:=optional,
                   org.terracotta.toolkit.*;resolution:=optional,
-                  org.quartz.*;resolution:=optional,
-                  org.terracotta.quartz.*;resolution:=optional,
                   com.sun.management.*;resolution:="optional",
                   net.sf.ehcache.terracotta.security;resolution:=optional,
                   org.jboss.vfs;resolution:=optional,

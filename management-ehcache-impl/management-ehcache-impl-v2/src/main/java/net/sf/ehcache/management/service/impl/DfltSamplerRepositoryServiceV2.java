@@ -330,9 +330,6 @@ public class DfltSamplerRepositoryServiceV2 implements SamplerRepositoryServiceV
     String requestClusterUUID = remoteAgentEndpoint.getRequestClusterUUID();
 
     cacheManagerSamplerRepoLock.readLock().lock();
-
-    List<SamplerRepoEntry> disabledSamplerRepoEntries = new ArrayList<SamplerRepoEntry>();
-
     try {
       if (cacheManagerNames == null) {
         for (Map.Entry<String, SamplerRepoEntry> entry : cacheManagerSamplerRepo.entrySet()) {
@@ -340,10 +337,13 @@ public class DfltSamplerRepositoryServiceV2 implements SamplerRepositoryServiceV
             continue;
           }
           enableNonStopFor(entry.getValue(), false);
-          disabledSamplerRepoEntries.add(entry.getValue());
-          for (CacheSampler sampler : entry.getValue().getComprehensiveCacheSamplers(cacheNames)) {
-            builder = builder == null ? CacheEntityBuilderV2.createWith(sampler, entry.getKey()) : builder
-                .add(sampler, entry.getKey());
+          try {
+            for (CacheSampler sampler : entry.getValue().getComprehensiveCacheSamplers(cacheNames)) {
+              builder = builder == null ? CacheEntityBuilderV2.createWith(sampler, entry.getKey()) : builder
+                      .add(sampler, entry.getKey());
+            }
+          } finally {
+            enableNonStopFor(entry.getValue(), true);
           }
         }
       } else {
@@ -351,9 +351,12 @@ public class DfltSamplerRepositoryServiceV2 implements SamplerRepositoryServiceV
           SamplerRepoEntry entry = cacheManagerSamplerRepo.get(cmName);
           if (entry != null && entry.isConnectedToCluster(requestClusterUUID)) {
             enableNonStopFor(entry, false);
-            disabledSamplerRepoEntries.add(entry);
-            for (CacheSampler sampler : entry.getComprehensiveCacheSamplers(cacheNames)) {
-              builder = builder == null ? CacheEntityBuilderV2.createWith(sampler, cmName) : builder.add(sampler, cmName);
+            try {
+              for (CacheSampler sampler : entry.getComprehensiveCacheSamplers(cacheNames)) {
+                builder = builder == null ? CacheEntityBuilderV2.createWith(sampler, cmName) : builder.add(sampler, cmName);
+              }
+            } finally {
+              enableNonStopFor(entry, true);
             }
           }
         }
@@ -364,9 +367,6 @@ public class DfltSamplerRepositoryServiceV2 implements SamplerRepositoryServiceV
         entities = attributes == null ? builder.build() : builder.add(attributes).build();
       }
     } finally {
-      for (SamplerRepoEntry samplerRepoEntry : disabledSamplerRepoEntries) {
-        enableNonStopFor(samplerRepoEntry, true);
-      }
       cacheManagerSamplerRepoLock.readLock().unlock();
     }
 
@@ -443,8 +443,6 @@ public class DfltSamplerRepositoryServiceV2 implements SamplerRepositoryServiceV
 
     cacheManagerSamplerRepoLock.readLock().lock();
 
-    List<SamplerRepoEntry> disabledSamplerRepoEntries = new ArrayList<SamplerRepoEntry>();
-
     try {
       if (cacheManagerNames == null) {
         for (Map.Entry<String, SamplerRepoEntry> entry : cacheManagerSamplerRepo.entrySet()) {
@@ -452,9 +450,12 @@ public class DfltSamplerRepositoryServiceV2 implements SamplerRepositoryServiceV
             continue;
           }
           enableNonStopFor(entry.getValue(), false);
-          disabledSamplerRepoEntries.add(entry.getValue());
-          for (CacheSampler sampler : entry.getValue().getComprehensiveCacheSamplers(cacheNames)) {
-            builder.add(sampler, entry.getKey());
+          try {
+            for (CacheSampler sampler : entry.getValue().getComprehensiveCacheSamplers(cacheNames)) {
+              builder.add(sampler, entry.getKey());
+            }
+          } finally {
+            enableNonStopFor(entry.getValue(), true);
           }
         }
       } else {
@@ -462,9 +463,12 @@ public class DfltSamplerRepositoryServiceV2 implements SamplerRepositoryServiceV
           SamplerRepoEntry entry = cacheManagerSamplerRepo.get(cmName);
           if (entry != null && entry.isConnectedToCluster(requestClusterUUID)) {
             enableNonStopFor(entry, false);
-            disabledSamplerRepoEntries.add(entry);
-            for (CacheSampler sampler : entry.getComprehensiveCacheSamplers(cacheNames)) {
-              builder.add(sampler, cmName);
+            try {
+              for (CacheSampler sampler : entry.getComprehensiveCacheSamplers(cacheNames)) {
+                builder.add(sampler, cmName);
+              }
+            } finally {
+              enableNonStopFor(entry, true);
             }
           }
         }
@@ -473,9 +477,6 @@ public class DfltSamplerRepositoryServiceV2 implements SamplerRepositoryServiceV
       responseEntityV2.getEntities().addAll(builder.build());
       return responseEntityV2;
     } finally {
-      for (SamplerRepoEntry samplerRepoEntry : disabledSamplerRepoEntries) {
-        enableNonStopFor(samplerRepoEntry, true);
-      }
       cacheManagerSamplerRepoLock.readLock().unlock();
     }
   }
@@ -484,17 +485,19 @@ public class DfltSamplerRepositoryServiceV2 implements SamplerRepositoryServiceV
   public void createOrUpdateCache(String cacheManagerName, String cacheName, CacheEntityV2 resource)
     throws ServiceExecutionException {
     cacheManagerSamplerRepoLock.readLock().lock();
-
-    SamplerRepoEntry entry = cacheManagerSamplerRepo.get(cacheManagerName);
     try {
+      SamplerRepoEntry entry = cacheManagerSamplerRepo.get(cacheManagerName);
       enableNonStopFor(entry, false);
-      if (entry != null) {
-        entry.updateCache(cacheName, resource);
-      } else {
-        throw new ServiceExecutionException("CacheManager not found !");
+      try {
+        if (entry != null) {
+          entry.updateCache(cacheName, resource);
+        } else {
+          throw new ServiceExecutionException("CacheManager not found !");
+        }
+      } finally {
+        enableNonStopFor(entry, true);
       }
     } finally {
-      enableNonStopFor(entry, true);
       cacheManagerSamplerRepoLock.readLock().unlock();
     }
 
@@ -503,15 +506,17 @@ public class DfltSamplerRepositoryServiceV2 implements SamplerRepositoryServiceV
   @Override
   public void clearCache(String cacheManagerName, String cacheName) {
     cacheManagerSamplerRepoLock.readLock().lock();
-
-    SamplerRepoEntry entry = cacheManagerSamplerRepo.get(cacheManagerName);
     try {
+      SamplerRepoEntry entry = cacheManagerSamplerRepo.get(cacheManagerName);
       enableNonStopFor(entry, false);
-      if (entry != null) {
-        entry.clearCache(cacheName);
+      try {
+        if (entry != null) {
+          entry.clearCache(cacheName);
+        }
+      } finally {
+        enableNonStopFor(entry, true);
       }
     } finally {
-      enableNonStopFor(entry, true);
       cacheManagerSamplerRepoLock.readLock().unlock();
     }
   }
@@ -552,9 +557,8 @@ public class DfltSamplerRepositoryServiceV2 implements SamplerRepositoryServiceV
   @Override
   public ResponseEntityV2<QueryResultsEntityV2> executeQuery(String cacheManagerName, String queryString) throws ServiceExecutionException {
     cacheManagerSamplerRepoLock.writeLock().lock();
-    ResponseEntityV2<QueryResultsEntityV2> responseEntityV2 = new ResponseEntityV2<QueryResultsEntityV2>();
-
     try {
+      ResponseEntityV2<QueryResultsEntityV2> responseEntityV2 = new ResponseEntityV2<QueryResultsEntityV2>();
       SamplerRepoEntry entry = cacheManagerSamplerRepo.get(cacheManagerName);
       if (entry != null) {
         try {

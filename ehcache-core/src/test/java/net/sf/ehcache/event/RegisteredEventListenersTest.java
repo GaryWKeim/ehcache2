@@ -15,7 +15,6 @@ import java.util.Collection;
 import net.sf.ehcache.CacheStoreHelper;
 import net.sf.ehcache.Ehcache;
 import net.sf.ehcache.Status;
-import net.sf.ehcache.distribution.CacheReplicator;
 import net.sf.ehcache.store.TerracottaStore;
 
 import org.hamcrest.Matcher;
@@ -55,24 +54,6 @@ public class RegisteredEventListenersTest {
     }
 
     @Test
-    public void testDetectRegisterCacheReplicator() {
-        RegisteredEventListeners registeredEventListeners = createRegisteredEventListeners(null);
-
-        CacheEventListener listener = mock(CacheReplicator.class);
-        registeredEventListeners.registerListener(listener);
-        assertThat(registeredEventListeners.hasCacheReplicators(), is(true));
-    }
-
-    @Test
-    public void testDetectRegisterNonCacheReplicator() {
-        RegisteredEventListeners registeredEventListeners = createRegisteredEventListeners(null);
-
-        CacheEventListener listener = mock(CacheEventListener.class);
-        registeredEventListeners.registerListener(listener);
-        assertThat(registeredEventListeners.hasCacheReplicators(), is(false));
-    }
-
-    @Test
     public void testCanRegisterListener() {
         RegisteredEventListeners registeredEventListeners = createRegisteredEventListeners(null);
 
@@ -93,28 +74,6 @@ public class RegisteredEventListenersTest {
         assertTrue(unregisterListener);
 
         assertThat((Collection) registeredEventListeners.getCacheEventListeners(), (Matcher) emptyIterable());
-    }
-
-    @Test
-    public void testCacheReplicatorAccounting() throws Exception {
-        RegisteredEventListeners registeredEventListeners = createRegisteredEventListeners(null);
-
-        CacheEventListener listener1 = mock(CacheEventListener.class);
-        CacheEventListener listener2 = mock(CacheEventListener.class);
-        CacheEventListener replicator1 = mock(CacheReplicator.class);
-        CacheEventListener replicator2 = mock(CacheReplicator.class);
-
-        registeredEventListeners.registerListener(listener1);
-        registeredEventListeners.registerListener(listener2);
-        registeredEventListeners.registerListener(replicator1);
-        registeredEventListeners.registerListener(replicator2);
-        assertThat(registeredEventListeners.hasCacheReplicators(), is(true));
-
-        registeredEventListeners.unregisterListener(replicator1);
-        assertThat(registeredEventListeners.hasCacheReplicators(), is(true));
-
-        registeredEventListeners.unregisterListener(replicator2);
-        assertThat(registeredEventListeners.hasCacheReplicators(), is(false));
     }
 
     @Test

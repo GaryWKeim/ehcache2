@@ -25,8 +25,7 @@
     <surefire.min-memory>512m</surefire.min-memory>
     <surefire.max-memory>1024m</surefire.max-memory>
     <skipCheckstyle>true</skipCheckstyle>
-    <quartz.version>2.2.3</quartz.version>
-    <osgi-test-tool.version>2.2</osgi-test-tool.version>
+    <osgi-test-tool.version>2.3</osgi-test-tool.version>
   </properties>
 
   <dependencies>  
@@ -49,12 +48,6 @@
     </dependency>   
     <dependency>
       <groupId>net.sf.ehcache</groupId>
-      <artifactId>management-ehcache-v1</artifactId>
-      <version>${project.version}</version>
-      <scope>test</scope>
-    </dependency>  
-    <dependency>
-      <groupId>net.sf.ehcache</groupId>
       <artifactId>management-ehcache-v2</artifactId>
       <version>${project.version}</version>
       <scope>test</scope>
@@ -68,11 +61,6 @@
     <dependency>
       <groupId>org.ow2.asm</groupId>
       <artifactId>asm</artifactId>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.hibernate</groupId>
-      <artifactId>hibernate-core</artifactId>
       <scope>test</scope>
     </dependency>
     <dependency>
@@ -159,11 +147,6 @@
       <artifactId>ant-launcher</artifactId>
       <version>1.10.12</version>
     </dependency>
-  <dependency>
-      <groupId>org.quartz-scheduler</groupId>
-      <artifactId>quartz</artifactId>
-      <version>${quartz.version}</version>
-    </dependency>
     <dependency>
       <groupId>io.rest-assured</groupId>
       <artifactId>rest-assured</artifactId>
@@ -180,17 +163,6 @@
       <groupId>org.apache.groovy</groupId>
       <artifactId>groovy-xml</artifactId>
     </dependency>
-    <dependency>
-      <groupId>net.sf.ehcache.test</groupId>
-      <artifactId>hibernate-ehcache-bundle</artifactId>
-      <version>${osgi-test-tool.version}</version>
-      <exclusions>
-        <exclusion>
-          <groupId>org.hibernate</groupId>
-          <artifactId>hibernate-core</artifactId>
-        </exclusion>
-      </exclusions>
-    </dependency>    
     <dependency>
       <groupId>org.terracotta.test</groupId>
       <artifactId>osgi-test-utils</artifactId>
@@ -271,4 +243,12 @@
     </profile>
   </profiles>
 
+  <repositories>
+    <repository>
+      <id>ow2</id>
+      <url>https://repository.ow2.org/nexus/content/repositories/ow2-legacy/</url>
+      <releases><enabled>true</enabled></releases>
+      <snapshots><enabled>false</enabled></snapshots>
+    </repository>
+  </repositories>
 </project>

@@ -26,7 +26,6 @@
     <management-core.version>2.1.35-SNAPSHOT</management-core.version>
     <clustered-entity-management.version>0.11.1</clustered-entity-management.version>
     <statistics.version>1.0.5</statistics.version>
-    <quartz.version>2.2.3</quartz.version>
     <skipJavadoc>false</skipJavadoc>
     <groovy.version>4.0.5</groovy.version>
     <groovy-maven-plugin.version>2.1.1</groovy-maven-plugin.version>
@@ -40,10 +39,8 @@
     <module>ehcache-core</module>
     <module>terracotta</module>
     <module>ehcache</module>
-    <module>management-ehcache-v1</module>
     <module>management-ehcache-v2</module>
     <module>management-ehcache-impl</module>
-    <module>ehcache-scheduled-refresh</module>
     <module>ehcache-search-parser</module>
   </modules>
 
@@ -79,14 +76,6 @@
         <artifactId>terracotta-toolkit-api-internal</artifactId>
         <version>${terracotta-toolkit-api-internal.version}</version>
         <scope>provided</scope>
-      </dependency>
-
-      <!-- Test dependencies -->
-
-      <dependency>
-        <groupId>org.quartz-scheduler</groupId>
-        <artifactId>quartz</artifactId>
-        <version>${quartz.version}</version>
       </dependency>
     </dependencies>
   </dependencyManagement>
@@ -200,8 +189,7 @@
                       project.artifacts.find{it.artifactId == artifactId}?.version ?: ''
                     }
                     def props = [
-                            'slf4j.version'           : find('slf4j-api'),
-                            'hibernate-core.version'  : find('hibernate-core')
+                            'slf4j.version'           : find('slf4j-api')
                     ]
                     println "Resolved dependency versions: ${props}"
                     project.properties.putAll(props)

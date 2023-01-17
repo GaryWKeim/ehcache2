@@ -6,13 +6,6 @@
     <!-- Disable for test ehcache.xml. Should go to the same place. -->
     <diskStore path="java.io.tmpdir"/>
 
-    <cacheManagerPeerProviderFactory class="net.sf.ehcache.distribution.RMICacheManagerPeerProviderFactory"
-                                     properties="peerDiscovery=automatic, multicastGroupAddress=230.0.0.1, multicastGroupPort=4446, timeToLive=0"/>
-
-
-    <cacheManagerPeerListenerFactory class="net.sf.ehcache.distribution.RMICacheManagerPeerListenerFactory"
-                                     properties="hostName=, port=, socketTimeoutMillis="/>
-
 
     <defaultCache
             maxElementsInMemory="10"
@@ -141,21 +134,6 @@
            timeToIdleSeconds="10000"
            timeToLiveSeconds="10000"
            overflowToDisk="true">
-    </cache>
-
-    <!-- Asynchronous Caching tests -->
-    <cache name="net.sf.ehcache.constructs.asynchronous.MessageCache"
-           maxElementsInMemory="1"
-           eternal="false"
-           timeToIdleSeconds="10000"
-           timeToLiveSeconds="10000"
-           overflowToDisk="true">
-        <cacheEventListenerFactory class="net.sf.ehcache.distribution.RMICacheReplicatorFactory"
-                                   properties="replicateAsynchronously=true,
-                                               replicatePuts=true,
-                                               replicateUpdates=true,
-                                               replicateUpdatesViaCopy=true,
-                                               replicateRemovals=true "/>
     </cache>
 
     <cache name="exceptionHandlingCache"

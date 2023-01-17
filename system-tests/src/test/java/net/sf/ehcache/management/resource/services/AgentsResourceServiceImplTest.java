@@ -34,7 +34,7 @@ import static org.hamcrest.Matchers.containsString;
  * works fine
  */
 public class AgentsResourceServiceImplTest extends ResourceServiceImplITHelper {
-  protected static final String EXPECTED_RESOURCE_LOCATION = "/tc-management-api/agents";
+  protected static final String EXPECTED_RESOURCE_LOCATION = "/tc-management-api/v2/agents";
 
   @BeforeClass
   public static void setUpCluster() throws Exception {
@@ -49,11 +49,10 @@ public class AgentsResourceServiceImplTest extends ResourceServiceImplITHelper {
    * @throws Exception
    */
   public void getAgentsTest__OneCacheManager() throws Exception {
-    // [{"version":null,"agentId":"embedded","agencyOf":"Ehcache","rootRepresentables":{"cacheManagerNames":"testCacheManager"}}]
     givenStandalone()
     .expect()
       .contentType(ContentType.JSON)
-      .rootPath("get(0)")
+      .rootPath("entities.get(0)")
       .body("agentId", equalTo("embedded"))
       .body("agencyOf", equalTo("Ehcache"))
       .body("rootRepresentables.cacheManagerNames", equalTo("testCacheManager"))
@@ -61,10 +60,9 @@ public class AgentsResourceServiceImplTest extends ResourceServiceImplITHelper {
     .when()
       .get(EXPECTED_RESOURCE_LOCATION);
 
-    // [{"version":null,"agentId":"embedded","agencyOf":"Ehcache","rootRepresentables":{"cacheManagerNames":"testCacheManager"}}]
     givenStandalone()
     .expect().contentType(ContentType.JSON)
-      .rootPath("get(0)")
+      .rootPath("entities.get(0)")
       .body("agentId", equalTo("embedded"))
       .body("agencyOf", equalTo("Ehcache"))
       .body("rootRepresentables.cacheManagerNames", equalTo("testCacheManager"))
@@ -72,19 +70,16 @@ public class AgentsResourceServiceImplTest extends ResourceServiceImplITHelper {
     .when()
       .get(EXPECTED_RESOURCE_LOCATION +";ids=embedded");
 
-    // [{"version":null,"agentId":"embedded","agencyOf":"Ehcache","rootRepresentables":{"cacheManagerNames":"testCacheManager"}}]
     givenStandalone()
     .expect()
       .contentType(ContentType.JSON)
       .statusCode(400)
       .when().get(EXPECTED_RESOURCE_LOCATION +";ids=w00t");
 
-    // /info
-    //[{"agentId":"embedded","agencyOf":"Ehcache","available":true,"secured":false,"sslEnabled":false,"needClientAuth":false,"licensed":false,"sampleHistorySize":30,"sampleIntervalSeconds":1,"enabled":true,"restAPIVersion":null}]
     givenStandalone()
     .expect()
       .contentType(ContentType.JSON)
-      .rootPath("get(0)")
+      .rootPath("entities.get(0)")
       .body("agentId", equalTo("embedded"))
       .body("agencyOf", equalTo("Ehcache"))
       .body("available", equalTo(true))
@@ -99,12 +94,10 @@ public class AgentsResourceServiceImplTest extends ResourceServiceImplITHelper {
     .when()
       .get(EXPECTED_RESOURCE_LOCATION + INFO);
 
-    // /info
-    //[{"agentId":"embedded","agencyOf":"Ehcache","available":true,"secured":false,"sslEnabled":false,"needClientAuth":false,"licensed":false,"sampleHistorySize":30,"sampleIntervalSeconds":1,"enabled":true,"restAPIVersion":null}]
     givenStandalone()
     .expect()
       .contentType(ContentType.JSON)
-      .rootPath("get(0)")
+      .rootPath("entities.get(0)")
       .body("agentId", equalTo("embedded"))
       .body("agencyOf", equalTo("Ehcache"))
       .body("available", equalTo(true))
@@ -133,7 +126,7 @@ public class AgentsResourceServiceImplTest extends ResourceServiceImplITHelper {
     givenStandalone()
     .expect()
       .contentType(ContentType.JSON)
-      .rootPath("get(0)")
+      .rootPath("entities.get(0)")
       .body("agentId", equalTo("embedded"))
       .body("agencyOf", equalTo("Ehcache"))
       .body("rootRepresentables.cacheManagerNames", allOf(containsString("testCacheManagerProgrammatic"), containsString("testCacheManager")))
@@ -146,10 +139,10 @@ public class AgentsResourceServiceImplTest extends ResourceServiceImplITHelper {
 
   @Test
   public void getAgentsTest__clustered() throws Exception {
-    // [{"version":null,"agentId":"embedded","agencyOf":"Ehcache","rootRepresentables":{"cacheManagerNames":"testCacheManager"}}]
     givenClustered()
     .expect()
       .contentType(ContentType.JSON)
+      .rootPath("entities")
       .body("get(0).agentId", Matchers.equalTo("embedded"))
       .body("get(0).agencyOf", Matchers.equalTo("TSA"))
       .body("get(0).rootRepresentables.urls", Matchers.equalTo("http://localhost:" + MANAGEMENT_PORT))

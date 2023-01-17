@@ -34,22 +34,16 @@ import net.sf.ehcache.config.TerracottaClientConfiguration;
 import net.sf.ehcache.config.TerracottaConfiguration;
 import net.sf.ehcache.constructs.refreshahead.RefreshAheadCache;
 import net.sf.ehcache.constructs.refreshahead.RefreshAheadCacheConfiguration;
-import net.sf.ehcache.constructs.scheduledrefresh.ScheduledRefreshCacheExtension;
-import net.sf.ehcache.constructs.scheduledrefresh.ScheduledRefreshConfiguration;
 import net.sf.ehcache.transaction.Decision;
 import net.sf.ehcache.writer.AbstractCacheWriter;
 import net.sf.ehcache.writer.CacheWriter;
 import net.sf.ehcache.writer.CacheWriterFactory;
 import org.junit.Test;
-import org.quartz.JobKey;
 import org.terracotta.modules.ehcache.async.AsyncConfig;
 import org.terracotta.modules.ehcache.transaction.SerializedReadCommittedClusteredSoftLock;
-import org.terracotta.quartz.collections.TimeTrigger;
 import org.terracotta.toolkit.builder.ToolkitCacheConfigBuilder;
-import org.terracotta.toolkit.builder.ToolkitStoreConfigBuilder;
 import org.terracotta.toolkit.internal.ToolkitInternal;
 import org.terracotta.toolkit.internal.store.ConfigFieldsInternal;
-import org.terracotta.toolkit.store.ToolkitConfigFields;
 import org.terracotta.toolkit.store.ToolkitConfigFields.Consistency;
 
 import bitronix.tm.BitronixTransactionManager;
@@ -63,9 +57,7 @@ import static net.sf.ehcache.config.MemoryUnit.MEGABYTES;
 import static net.sf.ehcache.config.TerracottaConfiguration.Consistency.STRONG;
 import static org.mockito.Mockito.atLeast;
 import static org.mockito.Mockito.eq;
-import static org.mockito.Mockito.isNull;
 import static org.mockito.Mockito.refEq;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.terracotta.toolkit.store.ToolkitConfigFields.Consistency.EVENTUAL;
@@ -371,69 +363,6 @@ public class InteractionTest {
     verifyNoMoreInteractions(toolkit);
   }
 
-  @Test
-  public void testScheduledRefreshCache() {
-    final String managerName = "foo";
-    final String cacheName = "bar";
-    ToolkitInternal toolkit = mockToolkitFor("testScheduledRefreshCache");
-    
-    CacheManager manager = new CacheManager(new Configuration().name(managerName).terracotta(new TerracottaClientConfiguration().url("testScheduledRefreshCache")));
-    try {
-      Cache cache = new Cache(new CacheConfiguration().name(cacheName).maxBytesLocalHeap(4, MEGABYTES).terracotta(new TerracottaConfiguration()));
-      cache.registerCacheExtension(new ScheduledRefreshCacheExtension(
-              new ScheduledRefreshConfiguration().cronExpression("0 0 0 1 JAN ? 2099")
-                      .terracottaConfigUrl("testScheduledRefreshCache").build(), cache));
-      manager.addCache(cache);
-
-      cache.put(new Element("foo", "bar"));
-    } finally {
-      manager.shutdown();
-    }
-    
-    verify(toolkit, atLeast(1)).getMap("com.terracotta.entity.ehcache.ClusteredCacheManager", String.class, ClusteredCacheManager.class);
-    verify(toolkit, atLeast(1)).getMap("__entity_cache_root@" + managerName, String.class, ToolkitBackedClusteredCache.class);
-    verify(toolkit, atLeast(1)).getMap("__tc_clustered-ehcache|" + managerName + "|" + cacheName + "|__tc_clustered-ehcache|configMap", String.class, Serializable.class);
-    
-    verify(toolkit).getCache(eq("__tc_clustered-ehcache|" + managerName + "|" + cacheName), refEq(new ToolkitCacheConfigBuilder()
-            .maxTTLSeconds(0).maxTTISeconds(0)
-            .consistency(EVENTUAL).concurrency(256)
-            .maxBytesLocalOffheap(0).maxBytesLocalHeap(MEGABYTES.toBytes(4L)).maxCountLocalHeap(0)
-            .evictionEnabled(true).localCacheEnabled(true).pinnedInLocalMemory(false)
-            .offheapEnabled(false).copyOnReadEnabled(false).compressionEnabled(false)
-            .configField(ConfigFieldsInternal.LOCAL_STORE_MANAGER_NAME_NAME, managerName)
-            .build()
-    ), eq(Serializable.class));
-    
-    verify(toolkit).getStore(eq("_tc_quartz_jobs|scheduledRefresh_" + managerName + "_" + cacheName),
-            refEq(new ToolkitStoreConfigBuilder().consistency(ToolkitConfigFields.Consistency.STRONG).concurrency(1).build()),
-            isNull());
-    verify(toolkit).getStore(eq("_tc_quartz_triggers|scheduledRefresh_" + managerName + "_" + cacheName),
-            refEq(new ToolkitStoreConfigBuilder().consistency(ToolkitConfigFields.Consistency.STRONG).concurrency(1).build()),
-            isNull());
-    verify(toolkit).getStore(eq("_tc_quartz_fired_trigger|scheduledRefresh_" + managerName + "_" + cacheName),
-            refEq(new ToolkitStoreConfigBuilder().consistency(ToolkitConfigFields.Consistency.STRONG).concurrency(1).build()),
-            isNull());
-    verify(toolkit).getStore(eq("_tc_quartz_calendar_wrapper|scheduledRefresh_" + managerName + "_" + cacheName),
-            refEq(new ToolkitStoreConfigBuilder().consistency(ToolkitConfigFields.Consistency.STRONG).concurrency(1).build()),
-            isNull());
-    
-    verify(toolkit).getSet("_tc_quartz_grp_names|scheduledRefresh_" + managerName + "_" + cacheName, String.class);
-    verify(toolkit).getSet("_tc_quartz_grp_paused_names|scheduledRefresh_" + managerName + "_" + cacheName, String.class);
-    verify(toolkit).getSet("_tc_quartz_blocked_jobs|scheduledRefresh_" + managerName + "_" + cacheName, JobKey.class);
-    verify(toolkit).getSet("_tc_quartz_grp_names_triggers|scheduledRefresh_" + managerName + "_" + cacheName, String.class);
-    verify(toolkit).getSet("_tc_quartz_grp_paused_trogger_names|scheduledRefresh_" + managerName + "_" + cacheName, String.class);
-    verify(toolkit).getSet("_tc_quartz_grp_jobs_scheduledRefresh_" + managerName + "_" + cacheName + "_grp|scheduledRefresh_" + managerName + "_" + cacheName, String.class);
-    verify(toolkit).getSet("_tc_quartz_grp_triggers_scheduledRefresh_" + managerName + "_" + cacheName + "_grp|scheduledRefresh_" + managerName + "_" + cacheName, String.class);
-
-    verify(toolkit).getSortedSet("_tc_time_trigger_sorted_set|scheduledRefresh_" + managerName + "_" + cacheName, TimeTrigger.class);
-    
-    verify(toolkit, atLeast(1)).getProperties();
-    
-    verify(toolkit, times(2)).shutdown();
-    allowNonPersistentInteractions(toolkit);
-    verifyNoMoreInteractions(toolkit);
-  }
-  
   public static class NullCacheWriterFactory extends CacheWriterFactory {
 
     @Override

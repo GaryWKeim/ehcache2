@@ -528,7 +528,6 @@ public class CacheConfiguration implements Cloneable {
      * Cache names have constraints on the characters they can use:
      * <ul>
      *     <li>the '/' character is illegal,</li>
-     *     <li>the '#' character does not work with RMI replication,</li>
      *     <li>caches that are registered as MBeans must obey the {@link javax.management.ObjectName} rules for unquoted value.
      *         This means the following characters are illegal: ',', '=', ':', '"', '*' and '?'.</li>
      * </ul>
@@ -548,7 +547,6 @@ public class CacheConfiguration implements Cloneable {
      * Cache names have constraints on the characters they can use:
      * <ul>
      *     <li>the '/' character is illegal,</li>
-     *     <li>the '#' character does not work with RMI replication,</li>
      *     <li>caches that are registered as MBeans must obey the {@link javax.management.ObjectName} rules for unquoted value.
      *         This means the following characters are illegal: ',', '=', ':', '"', '*' and '?'.</li>
      * </ul>
