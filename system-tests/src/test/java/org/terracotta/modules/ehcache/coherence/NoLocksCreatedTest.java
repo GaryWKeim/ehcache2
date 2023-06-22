@@ -51,6 +51,7 @@ public class NoLocksCreatedTest extends AbstractCacheTestBase {
   public NoLocksCreatedTest(TestConfig testConfig) {
     super("cache-coherence-test.xml", testConfig, App.class);
     testConfig.addTcProperty(TCPropertiesConsts.L1_LOCKMANAGER_TIMEOUT_INTERVAL, "9000000");
+    testConfig.getClientConfig().addExtraClientJvmArg("--add-opens=java.base/java.lang=ALL-UNNAMED");
   }
 
   @Override

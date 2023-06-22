@@ -1,5 +1,9 @@
 package net.sf.ehcache.store.disk;
 
+import static java.lang.System.getProperty;
+import static java.util.Locale.ROOT;
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
+import static net.sf.ehcache.util.RetryAssert.sleepFor;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
@@ -46,6 +50,7 @@ public class DiskStorePoolingTest {
     private volatile DiskStore diskStore;
     private volatile Element lastEvicted;
     private volatile CacheManager cacheManager;
+    private static final boolean isWindows = getProperty("os.name").toLowerCase(ROOT).contains("windows");
 
     private void dump() {
         System.out.println("# # # # # #");
@@ -108,6 +113,10 @@ public class DiskStorePoolingTest {
         cache.dispose();
         diskStore.dispose();
         cacheManager.shutdown();
+
+        if (isWindows) {
+            sleepFor(10, MILLISECONDS);
+        }
     }
 
     @Test

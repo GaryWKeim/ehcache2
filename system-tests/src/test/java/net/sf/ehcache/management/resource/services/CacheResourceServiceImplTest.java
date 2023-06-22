@@ -16,17 +16,13 @@
  */
 package net.sf.ehcache.management.resource.services;
 
-import static io.restassured.RestAssured.expect;
-import static io.restassured.RestAssured.given;
 import static org.hamcrest.CoreMatchers.allOf;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
 import net.sf.ehcache.Cache;
 import net.sf.ehcache.CacheManager;
-import net.sf.ehcache.Element;
 import net.sf.ehcache.config.CacheConfiguration;
 import net.sf.ehcache.config.Configuration;
 import net.sf.ehcache.config.ManagementRESTServiceConfiguration;
@@ -66,10 +62,6 @@ public class CacheResourceServiceImplTest extends ResourceServiceImplITHelper {
     // I need a cacheManager not clustered
     CacheManager standaloneCacheManager = createStandaloneCacheManagerARC();
     Cache cacheStandalone = standaloneCacheManager.getCache("testCacheStandaloneARC");
-
-    for (int i=0; i<1000 ; i++) {
-      cacheStandalone.put(new Element("key" + i, "value" + i));
-    }
 
     String agentsFilter = "";
     String cmsFilter = "";

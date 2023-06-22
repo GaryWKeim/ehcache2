@@ -32,6 +32,7 @@ public class IncoherentNodesTest extends AbstractCacheTestBase {
   public IncoherentNodesTest(TestConfig testConfig) {
     super("cache-coherence-test.xml", testConfig, IncoherentNodesTestClientOne.class,
           IncoherentNodesTestClientTwo.class);
+    testConfig.getClientConfig().addExtraClientJvmArg("--add-opens=java.base/java.lang=ALL-UNNAMED");
   }
 
   public static class IncoherentNodesTestClientOne extends ClientBase {

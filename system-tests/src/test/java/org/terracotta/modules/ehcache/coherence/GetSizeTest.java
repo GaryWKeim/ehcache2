@@ -39,6 +39,7 @@ public class GetSizeTest extends AbstractCacheTestBase {
 
   public GetSizeTest(TestConfig testConfig) {
     super("cache-coherence-test.xml", testConfig, App.class);
+    testConfig.getClientConfig().addExtraClientJvmArg("--add-opens=java.base/java.lang=ALL-UNNAMED");
   }
 
   public static class App extends ClientBase {

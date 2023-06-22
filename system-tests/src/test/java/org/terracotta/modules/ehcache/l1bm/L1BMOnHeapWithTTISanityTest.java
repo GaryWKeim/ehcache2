@@ -41,6 +41,7 @@ public class L1BMOnHeapWithTTISanityTest extends AbstractCacheTestBase {
 
   public L1BMOnHeapWithTTISanityTest(TestConfig testConfig) {
     super(testConfig, App.class, App.class);
+    testConfig.getClientConfig().addExtraClientJvmArg("--add-opens=java.base/java.lang=ALL-UNNAMED");
   }
 
   public static class App extends ClientBase {

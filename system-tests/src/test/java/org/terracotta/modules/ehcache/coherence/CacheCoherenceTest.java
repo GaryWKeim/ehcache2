@@ -27,6 +27,7 @@ public class CacheCoherenceTest extends AbstractCacheTestBase {
   public CacheCoherenceTest(TestConfig testConfig) {
     super("cache-coherence-test.xml", testConfig, CacheCoherenceTestL1Client.class, CacheCoherenceTestL1Client.class,
           CacheCoherenceTestL1Client.class);
+    testConfig.getClientConfig().addExtraClientJvmArg("--add-opens=java.base/java.lang=ALL-UNNAMED");
   }
 
 }

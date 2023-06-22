@@ -25,7 +25,7 @@
     <surefire.min-memory>512m</surefire.min-memory>
     <surefire.max-memory>1024m</surefire.max-memory>
     <skipCheckstyle>true</skipCheckstyle>
-    <osgi-test-tool.version>2.3</osgi-test-tool.version>
+    <osgi-test-tool.version>2.4</osgi-test-tool.version>
   </properties>
 
   <dependencies>  

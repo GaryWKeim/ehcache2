@@ -32,6 +32,7 @@ public class CacheCoherenceExpressTest extends AbstractCacheTestBase {
     super("cache-coherence-test.xml", testConfig, CacheCoherenceExpressClient.class, CacheCoherenceExpressClient.class,
           CacheCoherenceExpressClient.class);
     testConfig.addTcProperty("ehcache.evictor.logging.enabled", "true");
+    testConfig.getClientConfig().addExtraClientJvmArg("--add-opens=java.base/java.lang=ALL-UNNAMED");
   }
 
   @Override

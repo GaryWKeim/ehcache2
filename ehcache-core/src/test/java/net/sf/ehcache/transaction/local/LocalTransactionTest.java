@@ -29,10 +29,16 @@ import java.util.logging.Logger;
 
 import junit.framework.AssertionFailedError;
 import junit.framework.TestCase;
+import org.junit.experimental.categories.Category;
+import org.terracotta.test.categories.CheckShorts;
+
+import static java.lang.System.getProperty;
+import static java.util.Locale.ROOT;
 
 /**
  * @author lorban
  */
+@Category(CheckShorts.class)
 public class LocalTransactionTest extends TestCase {
 
     private final ElementValueComparator elementValueComparator = new DefaultElementValueComparator(new CacheConfiguration().copyOnRead(true).copyOnWrite(false));
@@ -40,6 +46,7 @@ public class LocalTransactionTest extends TestCase {
     private Ehcache cache1;
     private Ehcache cache2;
     private TransactionController transactionController;
+    private static final boolean isWindows = getProperty("os.name").toLowerCase(ROOT).contains("windows");
 
     @Override
     protected void setUp() throws Exception {
@@ -65,6 +72,10 @@ public class LocalTransactionTest extends TestCase {
             transactionController.rollback();
         }
         cacheManager.shutdown();
+
+        if (isWindows) {
+            Thread.sleep(10);
+        }
     }
 
   public void testTransactionContextLifeCycle() throws Exception {

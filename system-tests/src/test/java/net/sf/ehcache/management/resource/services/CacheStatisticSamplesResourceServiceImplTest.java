@@ -16,21 +16,20 @@
  */
 package net.sf.ehcache.management.resource.services;
 
-import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 import net.sf.ehcache.Cache;
 import net.sf.ehcache.Element;
 import org.junit.After;
-import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
 import java.io.UnsupportedEncodingException;
 
-import static io.restassured.RestAssured.expect;
-import static io.restassured.RestAssured.given;
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.greaterThan;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.nullValue;
 
 /**
  * @author: Anthony Dahanne
@@ -47,6 +46,7 @@ public class CacheStatisticSamplesResourceServiceImplTest extends ResourceServic
 
   @Before
   public void setUp() throws UnsupportedEncodingException {
+    // Leave testCache2 empty because it uses Byte-based sizing and we can't/don't want to open up java.lang
     cacheManagerMaxBytes = getCacheManagerMaxBytes();
   }
 
@@ -81,15 +81,13 @@ public class CacheStatisticSamplesResourceServiceImplTest extends ResourceServic
     String samplesFilter = "";
 
     Cache exampleCache = cacheManagerMaxElements.getCache("testCache");
-    Cache exampleCache2 = cacheManagerMaxBytes.getCache("testCache2");
 
     for (int i = 0; i < 1000; i++) {
-      exampleCache2.put(new Element("key" + i, "value" + i));
       exampleCache.put(new Element("key" + i, "value" + i));
       givenStandalone()
-      .expect()
+        .expect()
         .statusCode(200)
-      .when()
+        .when()
         .get(EXPECTED_RESOURCE_LOCATION, agentsFilter, cmsFilter, cachesFilter, samplesFilter);
     }
 
@@ -105,8 +103,8 @@ public class CacheStatisticSamplesResourceServiceImplTest extends ResourceServic
       .body("get(0).statName", equalTo("LocalHeapSize"))
       // we got samples
       .body("get(0).statValueByTimeMillis.size()", greaterThan(0))
-      // LocalHeapSize > 0
-      .body("get(0).statValueByTimeMillis.values()[0]", greaterThan(0))
+      // LocalHeapSize == 0
+      .body("get(0).statValueByTimeMillis.values()[0]", equalTo(0))
       .body("size()", is(1))
       .statusCode(200)
     .when()
@@ -120,10 +118,10 @@ public class CacheStatisticSamplesResourceServiceImplTest extends ResourceServic
       .body("get(0).name", equalTo("testCache2"))
       .body("get(0).cacheManagerName", equalTo("testCacheManagerProgrammatic"))
       .body("get(0).statName", equalTo("LocalHeapSize"))
-              // we got samples
+              // we got no samples
       .body("get(0).statValueByTimeMillis.size()", greaterThan(0))
-              // LocalHeapSize > 0
-      .body("get(0).statValueByTimeMillis.values()[0]", greaterThan(0))
+              // LocalHeapSize == null
+      .body("get(0).statValueByTimeMillis.values()[0]", equalTo(0))
       .body("size()", is(1))
       .statusCode(200)
     .when()
@@ -140,7 +138,7 @@ public class CacheStatisticSamplesResourceServiceImplTest extends ResourceServic
         .body("cacheManagerName", equalTo("testCacheManagerProgrammatic"))
         .body("statName", equalTo("LocalHeapSize"))
         .body("statValueByTimeMillis.size()", greaterThan(0))
-        .body("statValueByTimeMillis.values()[0]", greaterThan(0))
+        .body("statValueByTimeMillis.values()[0]", equalTo(0))
       .rootPath("entities.find { it.name =='testCache' }")
         .body("agentId", equalTo("embedded"))
         .body("cacheManagerName", equalTo("testCacheManager"))
@@ -169,28 +167,28 @@ public class CacheStatisticSamplesResourceServiceImplTest extends ResourceServic
    * @throws Exception
    */
   public void getCacheStatisticSamples__clustered() throws Exception {
-    String agentsFilter = ";ids=" + cacheManagerMaxBytesAgentId;
-    String cmsFilter= ";names=testCacheManagerProgrammatic";
-    String cachesFilter = ";names=testCache2";
+    String agentsFilter = ";ids=" + cacheManagerMaxElementsAgentId;
+    String cmsFilter= ";names=testCacheManager";
+    String cachesFilter = ";names=testCache";
     String samplesFilter = ";names=LocalHeapSize";
 
-    Cache exampleCache2 = cacheManagerMaxBytes.getCache("testCache2");
+    Cache exampleCache = cacheManagerMaxElements.getCache("testCache");
     for (int i = 0; i < 1000; i++) {
-      exampleCache2.put(new Element("key" + i, "value" + i));
+      exampleCache.put(new Element("key" + i, "value" + i));
       givenClustered()
         .expect()
-          .statusCode(200)
+        .statusCode(200)
         .when()
-          .get(EXPECTED_RESOURCE_LOCATION, agentsFilter, cmsFilter, cachesFilter, samplesFilter);
+        .get(EXPECTED_RESOURCE_LOCATION, agentsFilter, cmsFilter, cachesFilter, samplesFilter);
     }
 
     // we precise the cacheManager, cache and 2 stats we want to retrieve
     givenClustered()
     .expect()
       .contentType(ContentType.JSON).rootPath("entities")
-      .body("get(0).agentId", equalTo(cacheManagerMaxBytesAgentId))
-      .body("get(0).name", equalTo("testCache2"))
-      .body("get(0).cacheManagerName", equalTo("testCacheManagerProgrammatic"))
+      .body("get(0).agentId", equalTo(cacheManagerMaxElementsAgentId))
+      .body("get(0).name", equalTo("testCache"))
+      .body("get(0).cacheManagerName", equalTo("testCacheManager"))
       .body("get(0).statName", equalTo("LocalHeapSize"))
               // we got samples
       .body("get(0).statValueByTimeMillis.size()", greaterThan(0))
@@ -206,9 +204,9 @@ public class CacheStatisticSamplesResourceServiceImplTest extends ResourceServic
     givenClustered()
     .expect()
       .contentType(ContentType.JSON).rootPath("entities")
-      .body("get(0).agentId", equalTo(cacheManagerMaxBytesAgentId))
-      .body("get(0).name", equalTo("testCache2"))
-      .body("get(0).cacheManagerName", equalTo("testCacheManagerProgrammatic"))
+      .body("get(0).agentId", equalTo(cacheManagerMaxElementsAgentId))
+      .body("get(0).name", equalTo("testCache"))
+      .body("get(0).cacheManagerName", equalTo("testCacheManager"))
       .body("get(0).statName", equalTo("LocalHeapSize"))
               // we got samples
       .body("get(0).statValueByTimeMillis.size()", greaterThan(0))
@@ -230,9 +228,9 @@ public class CacheStatisticSamplesResourceServiceImplTest extends ResourceServic
         .body("agentId", equalTo(cacheManagerMaxBytesAgentId))
         .body("cacheManagerName", equalTo("testCacheManagerProgrammatic"))
         .body("statName", equalTo("LocalHeapSize"))
-        .body("statValueByTimeMillis.size()", greaterThan(0))
-        .body("statValueByTimeMillis.values()[0]", greaterThan(0))
-      .rootPath("entities.  find { it.name =='testCache' }")
+        .body("statValueByTimeMillis.size()", equalTo(0))
+        .body("statValueByTimeMillis.values()[0]", nullValue())
+      .rootPath("entities.find { it.name =='testCache' }")
         .body("agentId", equalTo(cacheManagerMaxElementsAgentId))
         .body("cacheManagerName", equalTo("testCacheManager"))
         .body("statName", equalTo("LocalHeapSize"))

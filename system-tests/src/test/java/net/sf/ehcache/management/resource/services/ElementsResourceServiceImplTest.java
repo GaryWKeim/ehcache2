@@ -16,20 +16,12 @@
  */
 package net.sf.ehcache.management.resource.services;
 
-import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 import net.sf.ehcache.Cache;
 import net.sf.ehcache.Element;
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import java.io.UnsupportedEncodingException;
-
-import static io.restassured.RestAssured.expect;
-import static io.restassured.RestAssured.given;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
@@ -46,11 +38,6 @@ public class ElementsResourceServiceImplTest extends ResourceServiceImplITHelper
   @BeforeClass
   public static void setUpCluster() throws Exception {
     setUpCluster(ElementsResourceServiceImplTest.class);
-  }
-
-  @Before
-  public void setUp() throws UnsupportedEncodingException {
-    cacheManagerMaxBytes = getCacheManagerMaxBytes();
   }
 
   @Test
@@ -72,7 +59,7 @@ public class ElementsResourceServiceImplTest extends ResourceServiceImplITHelper
     .when()
       .delete(EXPECTED_RESOURCE_LOCATION, agentsFilter, cmsFilter, cachesFilter);
 
-    cachesFilter = ";names=testCache2";
+    cachesFilter = ";names=testCache";
     givenStandalone()
       .contentType(ContentType.JSON)
     .expect()
@@ -90,7 +77,7 @@ public class ElementsResourceServiceImplTest extends ResourceServiceImplITHelper
    * @throws Exception
    */
   public void deleteElementsTest() throws Exception {
-    Cache exampleCache = cacheManagerMaxBytes.getCache("testCache2");
+    Cache exampleCache = cacheManagerMaxElements.getCache("testCache");
     for (int i=0; i<1000 ; i++) {
       exampleCache.put(new Element("key" + i, "value" + i));
     }
@@ -98,8 +85,8 @@ public class ElementsResourceServiceImplTest extends ResourceServiceImplITHelper
     assertThat(exampleCache.getSize(), is(1000));
 
     String agentsFilter = "";
-    String cachesFilter = ";names=testCache2";
-    String cmsFilter = ";names=testCacheManagerProgrammatic";
+    String cachesFilter = ";names=testCache";
+    String cmsFilter = ";names=testCacheManager";
     givenStandalone()
       .contentType(ContentType.JSON)
     .expect()
@@ -117,16 +104,16 @@ public class ElementsResourceServiceImplTest extends ResourceServiceImplITHelper
    * @throws Exception
    */
   public void deleteElementsTest__clustered() throws Exception {
-    Cache exampleCache = cacheManagerMaxBytes.getCache("testCache2");
+    Cache exampleCache = cacheManagerMaxElements.getCache("testCache");
     for (int i=0; i<1000 ; i++) {
       exampleCache.put(new Element("key" + i, "value" + i));
     }
-    final String agentsFilter = ";ids=" + cacheManagerMaxBytesAgentId;
+    final String agentsFilter = ";ids=" + cacheManagerMaxElementsAgentId;
 
     assertThat(exampleCache.getSize(), is(1000));
 
-    String cachesFilter = ";names=testCache2";
-    String cmsFilter = ";names=testCacheManagerProgrammatic";
+    String cachesFilter = ";names=testCache";
+    String cmsFilter = ";names=testCacheManager";
     givenClustered()
       .contentType(ContentType.JSON)
     .expect()
@@ -135,12 +122,5 @@ public class ElementsResourceServiceImplTest extends ResourceServiceImplITHelper
       .delete(EXPECTED_RESOURCE_LOCATION, agentsFilter, cmsFilter, cachesFilter);
 
     assertThat(exampleCache.getSize(), is(0));
-  }
-
-  @After
-  public void tearDown() {
-    if (cacheManagerMaxBytes != null) {
-      cacheManagerMaxBytes.shutdown();
-    }
   }
 }

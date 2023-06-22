@@ -26,6 +26,7 @@ public class L1BMOnHeapSanityTest extends AbstractCacheTestBase {
   public L1BMOnHeapSanityTest(TestConfig testConfig) {
     super(testConfig, L1BMOnHeapBasicSanityTestApp.class, L1BMOnHeapBasicSanityTestApp.class);
       testConfig.getL2Config().setMaxHeap(1024);
+    testConfig.getClientConfig().addExtraClientJvmArg("--add-opens=java.base/java.lang=ALL-UNNAMED");
   }
 
 }

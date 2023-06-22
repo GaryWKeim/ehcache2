@@ -16,6 +16,7 @@
  */
 package org.terracotta.ehcache.tests;
 
+import com.tc.util.concurrent.ThreadUtil;
 import net.sf.ehcache.Cache;
 import net.sf.ehcache.CacheManager;
 import net.sf.ehcache.Element;
@@ -24,6 +25,7 @@ import net.sf.ehcache.config.ConfigurationFactory;
 import net.sf.ehcache.config.TimeoutBehaviorConfiguration;
 import net.sf.ehcache.constructs.nonstop.NonStopCacheException;
 
+import net.sf.ehcache.constructs.nonstop.RejoinCacheException;
 import org.terracotta.modules.ehcache.ToolkitClientAccessor;
 import org.terracotta.tests.base.AbstractClientBase;
 import org.terracotta.toolkit.Toolkit;
@@ -154,8 +156,8 @@ public abstract class ClientBase extends AbstractClientBase {
         cache.getCacheConfiguration().getTerracottaConfiguration().getNonstopConfiguration()
             .addTimeoutBehavior(actualTimeoutBehavior);
         return;
-      } catch (NonStopCacheException e) {
-        TimeUnit.SECONDS.sleep(1L);
+      } catch (NonStopCacheException | RejoinCacheException e) {
+        ThreadUtil.reallySleep(TimeUnit.SECONDS, 1L);
       }
     }
   }
